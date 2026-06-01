@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Newspaper, Info, Tags, Users } from 'lucide-react';
+import { BookOpen, Folder, Info, LayoutGrid, Newspaper, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -24,15 +24,15 @@ export function AppSidebar() {
     if (isAdmin) {
         mainNavItems.push(
             {
-                title: 'Tentang Kami',
-                url: '/dashboard/abouts',
-                icon: Info,
-            },
-            {
-                title: 'Postingan',
+                title: 'Manage Public data',
                 url: '#',
                 icon: Newspaper,
                 items: [
+                    {
+                        title: 'Tentang Kami',
+                        url: '/dashboard/abouts',
+                        icon: Info,
+                    },
                     {
                         title: 'Berita',
                         url: '/dashboard/news',
@@ -43,28 +43,20 @@ export function AppSidebar() {
                         url: '/dashboard/categories',
                         icon: Tags,
                     },
+                    {
+                        title: 'Info Beasiswa',
+                        url: '/dashboard/beasiswas',
+                        icon: Info,
+                    },
                 ],
             },
             {
                 title: 'Divisi',
                 url: '/dashboard/divisions',
                 icon: Users,
-            }
+            },
         );
     }
-
-    const footerNavItems: NavItem[] = [
-        {
-            title: 'Repository',
-            url: 'https://github.com/laravel/react-starter-kit',
-            icon: Folder,
-        },
-        {
-            title: 'Documentation',
-            url: 'https://laravel.com/docs/starter-kits',
-            icon: BookOpen,
-        },
-    ];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -85,7 +77,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

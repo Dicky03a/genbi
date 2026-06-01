@@ -10,6 +10,8 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware('role:Superadmin|admin')->group(function () {
         Route::get('dashboard', function () {
@@ -23,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('dashboard/divisions', \App\Http\Controllers\DivisionController::class)->names('divisions');
         Route::post('dashboard/divisions/{division}/assign-user', [\App\Http\Controllers\DivisionController::class, 'assignUser'])->name('divisions.assign-user');
         Route::post('dashboard/divisions/{division}/remove-user', [\App\Http\Controllers\DivisionController::class, 'removeUser'])->name('divisions.remove-user');
+
+        Route::resource('dashboard/beasiswas', \App\Http\Controllers\BeasiswaController::class)->names('beasiswas');
     });
 
     Route::get('user/dashboard', function () {

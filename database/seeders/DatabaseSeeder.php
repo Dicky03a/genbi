@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             NewsSeeder::class,
             AboutSeeder::class,
             DivisionSeeder::class,
+            BeasiswaSeeder::class,
         ]);
     }
 }
