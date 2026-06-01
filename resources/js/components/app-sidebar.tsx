@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Newspaper, Info, Tags } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Newspaper, Info, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -29,14 +29,26 @@ export function AppSidebar() {
                 icon: Info,
             },
             {
-                title: 'Berita',
-                url: '/dashboard/news',
+                title: 'Postingan',
+                url: '#',
                 icon: Newspaper,
+                items: [
+                    {
+                        title: 'Berita',
+                        url: '/dashboard/news',
+                        icon: Newspaper,
+                    },
+                    {
+                        title: 'Kategori',
+                        url: '/dashboard/categories',
+                        icon: Tags,
+                    },
+                ],
             },
             {
-                title: 'Kategori',
-                url: '/dashboard/categories',
-                icon: Tags,
+                title: 'Divisi',
+                url: '/dashboard/divisions',
+                icon: Users,
             }
         );
     }

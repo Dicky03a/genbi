@@ -19,6 +19,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('dashboard/categories', CategoryController::class)->names('categories');
         Route::resource('dashboard/news', NewsController::class)->names('news');
         Route::resource('dashboard/abouts', AboutController::class)->names('abouts');
+
+        Route::resource('dashboard/divisions', \App\Http\Controllers\DivisionController::class)->names('divisions');
+        Route::post('dashboard/divisions/{division}/assign-user', [\App\Http\Controllers\DivisionController::class, 'assignUser'])->name('divisions.assign-user');
+        Route::post('dashboard/divisions/{division}/remove-user', [\App\Http\Controllers\DivisionController::class, 'removeUser'])->name('divisions.remove-user');
     });
 
     Route::get('user/dashboard', function () {

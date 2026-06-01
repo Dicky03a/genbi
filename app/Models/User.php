@@ -22,7 +22,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'division_id',
     ];
+
+    /**
+     * Get the division that owns the user.
+     */
+    public function division(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Division::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
