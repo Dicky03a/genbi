@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('dashboard/categories', CategoryController::class)->names('categories');
         Route::resource('dashboard/news', NewsController::class)->names('news');
+        Route::resource('dashboard/abouts', AboutController::class)->names('abouts');
     });
 
     Route::get('user/dashboard', function () {
