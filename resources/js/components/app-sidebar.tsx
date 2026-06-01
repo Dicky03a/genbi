@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Newspaper } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -19,6 +19,11 @@ export function AppSidebar() {
             url: dashboardUrl,
             icon: LayoutGrid,
         },
+        {
+            title: 'Berita',
+            url: '/dashboard/news',
+            icon: Newspaper,
+        }
     ];
 
     const footerNavItems: NavItem[] = [
