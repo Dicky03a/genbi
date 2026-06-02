@@ -1,4 +1,5 @@
 import { AboutSection } from '@/components/about-section';
+import { HomeNewsSection } from '@/components/home-news-section';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
@@ -16,9 +17,10 @@ interface AppPageProps extends SharedData {
         mission: string[];
         profile: string;
     };
+    latestNews: any[];
 }
 
-export default function App({ about }: AppPageProps) {
+export default function App({ about, latestNews }: AppPageProps) {
     const marqueeRef = useRef<HTMLDivElement>(null);
 
     useGSAP(
@@ -89,6 +91,9 @@ export default function App({ about }: AppPageProps) {
                 </section>
 
                 <AboutSection about={about} />
+
+                {/* Latest News Section */}
+                <HomeNewsSection news={latestNews} />
             </main>
 
             <PublicFooter />

@@ -21,6 +21,27 @@ class NewsController extends Controller
     }
 
     /**
+     * Display a listing of the resource for the public.
+     */
+    public function publicIndex(): Response
+    {
+        return Inertia::render('front/news/index', [
+            'news' => News::with('category')->latest()->get(),
+        ]);
+    }
+
+    /**
+     * Display the specified resource for the public.
+     */
+    public function publicShow(News $news): Response
+    {
+        return Inertia::render('front/news/show', [
+            'news' => $news->load(['category', 'author']),
+            'recentNews' => News::where('id', '!=', $news->id)->latest()->take(3)->get(),
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(): Response

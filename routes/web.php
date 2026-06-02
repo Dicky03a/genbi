@@ -8,6 +8,8 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     $about = \App\Models\About::first();
+    $latestNews = \App\Models\News::with('category')->latest()->take(3)->get();
+    
     return Inertia::render('app', [
         'about' => $about ? [
             'tagline' => $about->tagline,
@@ -19,9 +21,13 @@ Route::get('/', function () {
             'vision' => 'Menjadi komunitas penerima beasiswa yang unggul dan berkontribusi nyata bagi Indonesia.',
             'mission' => ['Mengembangkan potensi kepemimpinan.', 'Meningkatkan kepedulian sosial.', 'Menjadi agen perubahan.'],
             'profile' => 'GenBI adalah komunitas penerima beasiswa Bank Indonesia yang tersebar di seluruh perguruan tinggi di Indonesia.',
-        ]
+        ],
+        'latestNews' => $latestNews
     ]);
 })->name('home');
+
+Route::get('berita', [NewsController::class, 'publicIndex'])->name('berita.index');
+Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('berita.show');
 
 Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
 
