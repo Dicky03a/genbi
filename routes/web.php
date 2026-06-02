@@ -7,7 +7,20 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('app');
+    $about = \App\Models\About::first();
+    return Inertia::render('app', [
+        'about' => $about ? [
+            'tagline' => $about->tagline,
+            'vision' => $about->vision,
+            'mission' => $about->mission,
+            'profile' => $about->profile,
+        ] : [
+            'tagline' => 'Membangun masa depan pemimpin bangsa yang berintegritas dan inovatif.',
+            'vision' => 'Menjadi komunitas penerima beasiswa yang unggul dan berkontribusi nyata bagi Indonesia.',
+            'mission' => ['Mengembangkan potensi kepemimpinan.', 'Meningkatkan kepedulian sosial.', 'Menjadi agen perubahan.'],
+            'profile' => 'GenBI adalah komunitas penerima beasiswa Bank Indonesia yang tersebar di seluruh perguruan tinggi di Indonesia.',
+        ]
+    ]);
 })->name('home');
 
 Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
