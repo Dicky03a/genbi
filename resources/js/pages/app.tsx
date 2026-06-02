@@ -1,3 +1,4 @@
+import { AboutSection } from '@/components/about-section';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
@@ -86,6 +87,8 @@ export default function App({ about }: AppPageProps) {
                         </div>
                     </div>
                 </section>
+
+                <AboutSection about={about} />
             </main>
 
             <PublicFooter />
