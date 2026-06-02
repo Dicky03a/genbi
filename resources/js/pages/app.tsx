@@ -56,7 +56,9 @@ export default function App({ about, latestNews }: AppPageProps) {
 
     return (
         <div className="min-h-screen bg-[#ffffff] font-sans text-[#1d1d1f] selection:bg-[#0066cc]/20 selection:text-[#0066cc]">
-            <Head title="GenBi Unugiri" />
+            <Head title="GenBi Unugiri">
+                <link rel="preload" as="image" href="/asset/foto/home.webp" fetchpriority="high" />
+            </Head>
 
             <PublicNavbar />
 

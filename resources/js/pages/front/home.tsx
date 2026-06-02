@@ -8,11 +8,13 @@ export function HomeSection({ tagline }: HomeProps) {
     return (
         <section className="relative mb-3 px-4 pt-4 sm:px-6 md:px-8 md:pt-6">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[24px] shadow-[0_10px_40px_rgba(0,0,0,0.08)] md:aspect-[21/9]">
-                {/* Hero Image */}
+                {/* Hero Image - High Priority Loading */}
                 <img
                     src={heroImage}
                     alt="GenBI Hero"
                     className="h-full w-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
                 />
 
                 {/* Subtle Black Inner Shadow Overlay - Responsive */}
