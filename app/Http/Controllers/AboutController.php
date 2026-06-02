@@ -19,6 +19,16 @@ class AboutController extends Controller
     }
 
     /**
+     * Display the profile for the public.
+     */
+    public function publicProfile(): Response
+    {
+        return Inertia::render('front/profile/index', [
+            'about' => About::first(),
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(): Response

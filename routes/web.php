@@ -26,6 +26,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('profile', [AboutController::class, 'publicProfile'])->name('profile');
 Route::get('berita', [NewsController::class, 'publicIndex'])->name('berita.index');
 Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('berita.show');
 

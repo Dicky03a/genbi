@@ -42,7 +42,7 @@ export function PublicNavbar() {
 
     const navItems: NavItemData[] = [
         { id: 'home', label: 'Home', url: '/', icon: Home },
-        { id: 'Profile', label: 'Profile', url: '/profile', icon: User },
+        { id: 'Profile', label: 'Profile', url: route('profile'), icon: User },
         { id: 'beasiswa', label: 'Informasi Beasiswa', url: '/beasiswa', icon: Info },
         { id: 'berita', label: 'Berita', url: '/berita', icon: Newspaper },
         { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },

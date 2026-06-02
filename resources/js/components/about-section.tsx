@@ -28,7 +28,7 @@ export function AboutSection({ about }: AboutProps) {
                         </div>
                         <div>
                             <Link
-                                href="#"
+                                href={route('profile')}
                                 className="group inline-flex items-center text-[19px] font-medium text-[#0066cc] hover:underline md:text-[21px]"
                             >
                                 Selengkapnya
