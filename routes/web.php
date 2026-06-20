@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,6 +33,9 @@ Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('b
 
 Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
 
+Route::get('divisi', [\App\Http\Controllers\DivisionController::class, 'publicIndex'])->name('divisi.index');
+Route::get('divisi/{division}', [\App\Http\Controllers\DivisionController::class, 'publicShow'])->name('divisi.show');
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware('role:Superadmin|admin')->group(function () {
         Route::get('dashboard', function () {
@@ -47,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('dashboard/divisions/{division}/remove-user', [\App\Http\Controllers\DivisionController::class, 'removeUser'])->name('divisions.remove-user');
 
         Route::resource('dashboard/beasiswas', \App\Http\Controllers\BeasiswaController::class)->names('beasiswas');
+
+        Route::resource('dashboard/users', UserController::class)->names('users');
     });
 
     Route::get('user/dashboard', function () {

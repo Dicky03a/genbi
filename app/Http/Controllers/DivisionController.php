@@ -120,4 +120,24 @@ class DivisionController extends Controller
 
         return back()->with('error', 'User not found in this division.');
     }
+
+    /**
+     * Public view for divisions index.
+     */
+    public function publicIndex(): Response
+    {
+        return Inertia::render('public/division/index', [
+            'divisions' => $this->divisionService->getAll(),
+        ]);
+    }
+
+    /**
+     * Public view for division show.
+     */
+    public function publicShow(Division $division): Response
+    {
+        return Inertia::render('public/division/show', [
+            'division' => $division->load('users'),
+        ]);
+    }
 }

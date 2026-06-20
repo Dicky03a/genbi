@@ -34,9 +34,14 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    nim?: string;
+    prodi?: string;
+    angkatan?: string;
+    alamat?: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
     roles: string[];
-    [key: string]: unknown; // This allows for additional properties...
+    division?: { id: number; name: string } | null;
+    [key: string]: unknown;
 }

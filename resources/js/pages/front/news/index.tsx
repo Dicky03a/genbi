@@ -1,21 +1,51 @@
+import { NewsCard } from '@/components/news-card';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
-import { NewsCard } from '@/components/news-card';
+import { useGSAP } from '@gsap/react';
 import { Head } from '@inertiajs/react';
+import { gsap } from 'gsap';
+import { useRef } from 'react';
 
 interface NewsIndexProps {
     news: any[];
 }
 
 export default function NewsIndex({ news }: NewsIndexProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useGSAP(
+        () => {
+            // Header entrance
+            gsap.from('.news-header', {
+                y: 50,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'power4.out',
+            });
+
+            // Grid entrance
+            if (news.length > 0) {
+                gsap.from('.news-card-item', {
+                    y: 30,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.1,
+                    delay: 0.4,
+                    ease: 'power3.out',
+                });
+            }
+        },
+        { scope: containerRef, dependencies: [news] },
+    );
+
     return (
-        <div className="min-h-screen bg-white font-sans text-[#1d1d1f]">
+        <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
             <Head title="Berita & Artikel" />
             <PublicNavbar />
 
-            <main className="pt-[100px]">
+            <main className="pt-[40px]">
                 {/* Header Section */}
-                <section className="bg-[#f5f5f7] py-[64px] md:py-[100px]">
+                <section className="news-header py-[64px] md:py-[100px]">
                     <div className="mx-auto max-w-[980px] px-6 text-center">
                         <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
                             Berita & Artikel
@@ -32,7 +62,9 @@ export default function NewsIndex({ news }: NewsIndexProps) {
                         {news.length > 0 ? (
                             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                                 {news.map((item) => (
-                                    <NewsCard key={item.id} news={item} />
+                                    <div key={item.id} className="news-card-item">
+                                        <NewsCard news={item} />
+                                    </div>
                                 ))}
                             </div>
                         ) : (

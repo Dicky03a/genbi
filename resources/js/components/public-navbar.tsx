@@ -66,7 +66,7 @@ export function PublicNavbar() {
             {/* DESKTOP NAVBAR (≥ 768px) */}
             <header
                 className={cn(
-                    'fixed top-0 right-0 left-0 z-50 mx-90 my-10 hidden h-[64px] items-center justify-between rounded-3xl px-6 transition-all duration-300 md:flex lg:px-12',
+                    'fixed top-0 right-0 left-0 z-50 mx-90 my-10 hidden h-[64px] items-center justify-between rounded-3xl px-6 transition-all duration-300 md:flex lg:px-6',
                     'border-b border-[rgba(0,0,0,0.16)] bg-[rgba(255,255,255,0.75)] backdrop-blur-[16px]',
                     scrolled ? 'shadow-[0_4px_24px_rgba(0,0,0,0.06)]' : '',
                 )}
@@ -75,7 +75,7 @@ export function PublicNavbar() {
                 {/* Left: Logo */}
                 <div className="flex items-center">
                     <Link href="/" className="group flex items-center gap-2">
-                        <AppLogoIcon className="h-7 w-7 fill-current text-[#1a1a2e]" />
+                        <AppLogoIcon className="w- h-7 fill-current text-[#1a1a2e]" />
                     </Link>
                 </div>
 
@@ -130,7 +130,7 @@ export function PublicNavbar() {
                         'border border-[rgba(255,255,255,0.7)] shadow-[0_8px_32px_rgba(0,0,0,0.12)]',
                     )}
                 >
-                    {navItems.slice(0, 4).map((item) => {
+                    {navItems.slice(0, 5).map((item) => {
                         const isActive = currentPath === item.url && !mobileMenuOpen;
                         const Icon = item.icon;
                         return (
@@ -155,7 +155,7 @@ export function PublicNavbar() {
                     <button onClick={toggleMobileMenu} className="relative flex h-[54px] w-[54px] flex-col items-center justify-center">
                         <div
                             className={cn(
-                                'flex h-11 w-11 items-center justify-center rounded-[14px] transition-all duration-200',
+                                'flex h-11 w-11 items-center justify-center rounded-[14px] transition-all duration-300',
                                 mobileMenuOpen ? 'bg-[#3B5BDB]' : 'bg-transparent',
                             )}
                         >
