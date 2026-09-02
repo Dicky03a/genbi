@@ -22,6 +22,11 @@ interface AppPageProps extends SharedData {
 
 export default function App({ about, latestNews }: AppPageProps) {
     const marqueeRef = useRef<HTMLDivElement>(null);
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const description = about.tagline
+        ? stripHtml(about.tagline).substring(0, 155)
+        : 'Membangun masa depan pemimpin bangsa yang berintegritas dan inovatif.';
 
     useGSAP(
         () => {
@@ -56,8 +61,20 @@ export default function App({ about, latestNews }: AppPageProps) {
 
     return (
         <div className="min-h-screen bg-[#ffffff] font-sans text-[#1d1d1f] selection:bg-[#0066cc]/20 selection:text-[#0066cc]">
-            <Head title="GenBi Unugiri">
-                <link rel="preload" as="image" href="/asset/foto/home.webp" fetchpriority="high" />
+            <Head title="GenBI Unugiri | Generasi Baru Indonesia">
+                <meta name="description" content={description} />
+                <meta property="og:title" content="GenBI Unugiri | Generasi Baru Indonesia" />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <meta property="og:url" content={pageUrl} />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="GenBI Unugiri" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="GenBI Unugiri | Generasi Baru Indonesia" />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <link rel="canonical" href={pageUrl} />
+                <link rel="preload" as="image" href="/asset/foto/home.webp" fetchPriority="high" />
             </Head>
 
             <PublicNavbar />

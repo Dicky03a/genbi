@@ -38,26 +38,43 @@ export default function NewsIndex({ news }: NewsIndexProps) {
         { scope: containerRef, dependencies: [news] },
     );
 
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const description = 'Temukan berita terbaru, pengumuman, dan artikel informatif dari GenBI Unugiri.';
+
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title="Berita & Artikel" />
+            <Head title="Berita & Artikel | GenBI Unugiri">
+                <meta name="description" content={description} />
+                <meta property="og:title" content="Berita & Artikel | GenBI Unugiri" />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <meta property="og:url" content={pageUrl} />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="GenBI Unugiri" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Berita & Artikel | GenBI Unugiri" />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <link rel="canonical" href={pageUrl} />
+            </Head>
             <PublicNavbar />
 
-            <main className="pt-[40px]">
+            <main className="pt-2 md:pt-[40px]">
                 {/* Header Section */}
-                <section className="news-header py-[64px] md:py-[100px]">
+                <section className="news-header py-[40px] md:py-[100px]">
                     <div className="mx-auto max-w-[980px] px-6 text-center">
-                        <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
+                        <h1 className="text-[30px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
                             Berita & Artikel
                         </h1>
-                        <p className="mt-6 text-[19px] leading-[1.47] text-[#1d1d1f] md:text-[21px]">
+                        <p className="mt-4 text-[17px] leading-[1.47] text-[#1d1d1f] md:mt-6 md:text-[21px]">
                             Temukan cerita terbaru, pengumuman, dan artikel informatif dari kami.
                         </p>
                     </div>
                 </section>
 
                 {/* Grid Section */}
-                <section className="py-[80px]">
+                <section className="py-[40px] md:py-[80px]">
                     <div className="mx-auto max-w-[1440px] px-6 md:px-12">
                         {news.length > 0 ? (
                             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">

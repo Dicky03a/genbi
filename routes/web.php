@@ -36,10 +36,36 @@ Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'public
 Route::get('divisi', [\App\Http\Controllers\DivisionController::class, 'publicIndex'])->name('divisi.index');
 Route::get('divisi/{division}', [\App\Http\Controllers\DivisionController::class, 'publicShow'])->name('divisi.show');
 
+Route::get('privacy-policy', fn() => Inertia::render('front/privacy-policy'))->name('privacy-policy');
+Route::get('terms-of-use', fn() => Inertia::render('front/terms-of-use'))->name('terms-of-use');
+Route::get('sitemap', fn() => Inertia::render('front/sitemap'))->name('sitemap');
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware('role:Superadmin|admin')->group(function () {
         Route::get('dashboard', function () {
-            return Inertia::render('dashboard');
+            return Inertia::render('dashboard', [
+                'stats' => [
+                    'users'     => \App\Models\User::count(),
+                    'news'      => \App\Models\News::count(),
+                    'published' => \App\Models\News::where('status', 'published')->count(),
+                    'divisions' => \App\Models\Division::count(),
+                    'beasiswas' => \App\Models\Beasiswa::count(),
+                ],
+                'recentNews' => \App\Models\News::with(['category', 'author'])
+                    ->latest()
+                    ->take(5)
+                    ->get()
+                    ->map(fn($n) => [
+                        'id'           => $n->id,
+                        'title'        => $n->title,
+                        'slug'         => $n->slug,
+                        'status'       => $n->status,
+                        'category'     => $n->category?->name,
+                        'author'       => $n->author?->name,
+                        'published_at' => $n->published_at?->toDateString(),
+                        'created_at'   => $n->created_at->toDateString(),
+                    ]),
+            ]);
         })->name('dashboard');
 
         Route::resource('dashboard/categories', CategoryController::class)->names('categories');

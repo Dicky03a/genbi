@@ -91,45 +91,63 @@ export default function DivisionShow({ division }: Props) {
         { scope: containerRef, dependencies: [division] },
     );
 
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const description = division.keterangan
+        ? division.keterangan.substring(0, 155)
+        : `Kenali lebih dekat Divisi ${division.name} di GenBI Unugiri.`;
+    const imageUrl = division.foto ? `${origin}/storage/${division.foto}` : `${origin}/asset/foto/home-1920.webp`;
+
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title={`Divisi ${division.name}`} />
+            <Head title={`Divisi ${division.name} | GenBI Unugiri`}>
+                <meta name="description" content={description} />
+                <meta property="og:title" content={`Divisi ${division.name} | GenBI Unugiri`} />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={imageUrl} />
+                <meta property="og:url" content={pageUrl} />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="GenBI Unugiri" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`Divisi ${division.name} | GenBI Unugiri`} />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={imageUrl} />
+                <link rel="canonical" href={pageUrl} />
+            </Head>
             <PublicNavbar />
 
-            <main className="pt-[80px] md:pt-[100px]">
-              
-
+            <main className="pt-0 md:pt-[100px]">
                 {/* Hero Section */}
-                <section className="bg-white py-[80px] md:py-[100px]">
+                <section className="bg-white py-[44px] md:py-[100px]">
                     <div className="mx-auto max-w-[980px] px-6 text-center">
-                        <h1 className="hero-title mb-8 text-[40px] font-semibold leading-[1.07] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
+                        <h1 className="hero-title mb-5 text-[28px] font-semibold leading-[1.07] tracking-[-0.02em] text-[#1d1d1f] md:mb-8 md:text-[56px] lg:tracking-[-0.28px]">
                             {division.name}.
                         </h1>
-                        <div className="hero-line mx-auto h-1.5 w-24 rounded-full bg-[#0066cc] mb-10" />
-                        <p className="hero-text mx-auto max-w-[800px] text-[19px] leading-[1.6] text-[#1d1d1f] md:text-[22px] md:font-light">
+                        <div className="hero-line mx-auto mb-6 h-1.5 w-20 rounded-full bg-[#0066cc] md:mb-10 md:w-24" />
+                        <p className="hero-text mx-auto max-w-[800px] text-[16px] leading-[1.6] text-[#1d1d1f] md:text-[22px] md:font-light">
                             {division.keterangan}
                         </p>
                     </div>
                 </section>
 
                 {/* Members Section */}
-                <section className="bg-[#f5f5f7] py-[100px] md:py-[120px]">
+                <section className="bg-[#f5f5f7] py-[50px] md:py-[120px]">
                     <div className="mx-auto max-w-[1200px] px-6">
-                        <div className="mb-16 text-center">
-                            <h2 className="text-[34px] font-semibold tracking-tight text-[#1d1d1f] md:text-[40px]">
+                        <div className="mb-10 text-center md:mb-16">
+                            <h2 className="text-[24px] font-semibold tracking-tight text-[#1d1d1f] md:text-[40px]">
                                 Anggota Divisi
                             </h2>
-                            <p className="mt-4 text-[17px] text-[#7a7a7a]">
+                            <p className="mt-3 text-[15px] text-[#7a7a7a] md:mt-4 md:text-[17px]">
                                 Bersama-sama membangun energi untuk negeri.
                             </p>
                         </div>
 
                         {division.users.length > 0 ? (
-                            <div className="member-grid grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                            <div className="member-grid grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
                                 {division.users.map((user) => (
                                     <div
                                         key={user.id}
-                                        className="member-card relative overflow-hidden rounded-[22px] bg-white ring-1 ring-[#e0e0e0]"
+                                        className="member-card relative overflow-hidden rounded-[16px] bg-white ring-1 ring-[#e0e0e0] md:rounded-[22px]"
                                         style={{ aspectRatio: '3/4' }}
                                     >
                                         {/* User Photo / Initials */}
@@ -141,18 +159,18 @@ export default function DivisionShow({ division }: Props) {
                                                     className="h-full w-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="text-[32px] font-medium text-[#0066cc]">
+                                                <div className="text-[24px] font-medium text-[#0066cc] md:text-[32px]">
                                                     {getInitials(user.name)}
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Bottom gradient caption */}
-                                        <div className="absolute inset-x-0 bottom-0 px-4 pb-4 pt-12" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)' }}>
-                                            <p className="truncate text-[14px] font-semibold text-white">
+                                        <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-10 md:px-4 md:pb-4 md:pt-12" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)' }}>
+                                            <p className="truncate text-[12px] font-semibold text-white md:text-[14px]">
                                                 {user.name}
                                             </p>
-                                            <p className="truncate text-[12px] text-[#cccccc]">
+                                            <p className="truncate text-[11px] text-[#cccccc] md:text-[12px]">
                                                 {user.prodi ?? 'Tidak ada prodi'}
                                             </p>
                                         </div>

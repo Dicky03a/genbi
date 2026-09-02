@@ -68,40 +68,57 @@ export default function DivisionIndex({ divisions }: Props) {
         { title: 'Divisi', href: '/divisi' },
     ];
 
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const description = 'Kenali divisi-divisi yang menggerakkan GenBI Unugiri dan peran masing-masing dalam organisasi kami.';
+
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title="Struktur Divisi" />
+            <Head title="Struktur Divisi | GenBI Unugiri">
+                <meta name="description" content={description} />
+                <meta property="og:title" content="Struktur Divisi | GenBI Unugiri" />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <meta property="og:url" content={pageUrl} />
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="GenBI Unugiri" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Struktur Divisi | GenBI Unugiri" />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
+                <link rel="canonical" href={pageUrl} />
+            </Head>
             <PublicNavbar />
 
             <main className="md:pt-[10px]">
                 {/* Hero Section */}
-                <section className="py-[80px] md:py-[120px]">
+                <section className="py-[44px] md:py-[120px]">
                     <div className="mx-auto max-w-[980px] px-6 text-center">
-                        <h1 className="hero-title text-[40px] font-semibold leading-[1.07] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
+                        <h1 className="hero-title text-[30px] font-semibold leading-[1.07] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
                             Struktur Divisi.
                         </h1>
-                        <p className="hero-text mt-8 text-[21px] leading-[1.47] text-[#1d1d1f] md:text-[24px] md:font-light md:leading-[1.5]">
+                        <p className="hero-text mt-5 text-[17px] leading-[1.47] text-[#1d1d1f] md:mt-8 md:text-[24px] md:font-light md:leading-[1.5]">
                             Mengenal lebih dekat bagian-bagian yang menggerakkan organisasi kami.
                         </p>
                     </div>
                 </section>
 
                 {/* Division Grid Section */}
-                <section className="py-[100px] md:py-[120px]">
+                <section className="py-[50px] md:py-[120px]">
                     <div className="mx-auto max-w-[1200px] px-6">
                         {divisions.length > 0 ? (
-                            <div className="division-grid grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="division-grid grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
                                 {divisions.map((item) => (
-                                    <div 
-                                        key={item.id} 
-                                        className="division-card group flex flex-col overflow-hidden rounded-[22px] bg-white ring-1 ring-[#e0e0e0] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
+                                    <div
+                                        key={item.id}
+                                        className="division-card group flex flex-col overflow-hidden rounded-[18px] bg-white ring-1 ring-[#e0e0e0] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] md:rounded-[22px]"
                                     >
                                         {/* Division Image */}
                                         <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f5f5f7]">
                                             {item.foto ? (
-                                                <img 
-                                                    src={`/storage/${item.foto}`} 
-                                                    alt={item.name} 
+                                                <img
+                                                    src={`/storage/${item.foto}`}
+                                                    alt={item.name}
                                                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                 />
                                             ) : (
@@ -112,11 +129,11 @@ export default function DivisionIndex({ divisions }: Props) {
                                         </div>
 
                                         {/* Content */}
-                                        <div className="flex flex-1 flex-col p-8">
-                                            <h2 className="mb-4 text-[24px] font-semibold tracking-tight text-[#1d1d1f]">
+                                        <div className="flex flex-1 flex-col p-5 md:p-8">
+                                            <h2 className="mb-3 text-[18px] font-semibold tracking-tight text-[#1d1d1f] md:mb-4 md:text-[24px]">
                                                 {item.name}
                                             </h2>
-                                            <p className="mb-8 flex-1 text-[17px] leading-relaxed text-[#7a7a7a] line-clamp-3">
+                                            <p className="mb-5 flex-1 text-[15px] leading-relaxed text-[#7a7a7a] line-clamp-3 md:mb-8 md:text-[17px]">
                                                 {item.keterangan}
                                             </p>
                                             <div className="mt-auto">
