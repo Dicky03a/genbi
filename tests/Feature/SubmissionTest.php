@@ -6,6 +6,7 @@ use App\Models\PointCategory;
 use App\Models\PointRate;
 use App\Models\User;
 use App\Services\PointSubmissionService;
+use App\Services\VerificationStateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -131,11 +132,11 @@ it('requires a reason when rejecting through the admin endpoint', function () {
 });
 
 it('rejects invalid verification transitions through a central rule', function () {
-    $service = app(\App\Services\VerificationStateService::class);
+    $service = app(VerificationStateService::class);
 
-    expect(fn () => $service->assertCanTransition('ditolak', 'menunggu'))
+    expect(fn () => $service->assertCanTransition('ditolak', 'disetujui'))
         ->toThrow(DomainException::class, 'Transisi status tidak valid');
 
-    expect(fn () => $service->assertCanTransition('disetujui', 'ditolak'))
+    expect(fn () => $service->assertCanTransition('disetujui', 'menunggu'))
         ->toThrow(DomainException::class, 'Transisi status tidak valid');
 });
