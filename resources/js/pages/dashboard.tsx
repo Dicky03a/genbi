@@ -1,12 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import {
-    BookOpen,
-    GraduationCap,
-    Layers,
-    Newspaper,
-    Plus,
-    Users,
-} from 'lucide-react';
+import { BookOpen, GraduationCap, Layers, Newspaper, Plus, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,9 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/dashboard' }];
 
 interface Stats {
     users: number;
@@ -24,6 +15,8 @@ interface Stats {
     published: number;
     divisions: number;
     beasiswas: number;
+    pending_attendances: number;
+    pending_submissions: number;
 }
 
 interface RecentNews {
@@ -122,11 +115,9 @@ export default function Dashboard({ stats, recentNews }: Props) {
                                     <CardContent className="p-5">
                                         <div className="flex items-start justify-between">
                                             <div>
-                                                <p className="text-sm text-muted-foreground">{card.title}</p>
+                                                <p className="text-muted-foreground text-sm">{card.title}</p>
                                                 <p className="mt-1 text-3xl font-bold">{card.value}</p>
-                                                {card.sub && (
-                                                    <p className="mt-0.5 text-xs text-muted-foreground">{card.sub}</p>
-                                                )}
+                                                {card.sub && <p className="text-muted-foreground mt-0.5 text-xs">{card.sub}</p>}
                                             </div>
                                             <div className={`rounded-lg p-2 ${card.bg}`}>
                                                 <Icon className={`h-5 w-5 ${card.color}`} />
@@ -139,6 +130,25 @@ export default function Dashboard({ stats, recentNews }: Props) {
                     })}
                 </div>
 
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Link href="/admin/absensi">
+                        <Card>
+                            <CardContent className="p-5">
+                                <p className="text-muted-foreground text-sm">Antrean absensi</p>
+                                <p className="text-3xl font-bold">{stats.pending_attendances}</p>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                    <Link href="/admin/pengajuan">
+                        <Card>
+                            <CardContent className="p-5">
+                                <p className="text-muted-foreground text-sm">Antrean pengajuan</p>
+                                <p className="text-3xl font-bold">{stats.pending_submissions}</p>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                </div>
+
                 <div className="grid gap-6 lg:grid-cols-3">
                     {/* Recent news table */}
                     <div className="lg:col-span-2">
@@ -146,26 +156,22 @@ export default function Dashboard({ stats, recentNews }: Props) {
                             <CardHeader className="flex flex-row items-center justify-between pb-3">
                                 <CardTitle className="text-base">Berita Terbaru</CardTitle>
                                 <Button asChild size="sm" variant="outline">
-                                    <Link href="/dashboard/news">
-                                        Lihat Semua
-                                    </Link>
+                                    <Link href="/dashboard/news">Lihat Semua</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent className="px-0 pb-0">
                                 {recentNews.length === 0 ? (
-                                    <p className="px-6 py-8 text-center text-sm text-muted-foreground">
-                                        Belum ada berita.
-                                    </p>
+                                    <p className="text-muted-foreground px-6 py-8 text-center text-sm">Belum ada berita.</p>
                                 ) : (
                                     <div className="divide-y">
                                         {recentNews.map((item) => (
                                             <div
                                                 key={item.id}
-                                                className="flex items-start justify-between gap-3 px-6 py-3 hover:bg-muted/30 transition-colors"
+                                                className="hover:bg-muted/30 flex items-start justify-between gap-3 px-6 py-3 transition-colors"
                                             >
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate text-sm font-medium">{item.title}</p>
-                                                    <p className="text-xs text-muted-foreground">
+                                                    <p className="text-muted-foreground text-xs">
                                                         {item.category ?? '—'} &middot; {item.author ?? '—'} &middot;{' '}
                                                         {item.published_at ?? item.created_at}
                                                     </p>
@@ -188,12 +194,7 @@ export default function Dashboard({ stats, recentNews }: Props) {
                             {quickActions.map((action) => {
                                 const Icon = action.icon;
                                 return (
-                                    <Button
-                                        key={action.label}
-                                        asChild
-                                        variant="outline"
-                                        className="w-full justify-start"
-                                    >
+                                    <Button key={action.label} asChild variant="outline" className="w-full justify-start">
                                         <Link href={action.href}>
                                             <Plus className="mr-2 h-4 w-4" />
                                             <Icon className="mr-2 h-4 w-4" />
@@ -204,22 +205,14 @@ export default function Dashboard({ stats, recentNews }: Props) {
                             })}
 
                             <div className="pt-2">
-                                <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                    Kelola
-                                </p>
+                                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">Kelola</p>
                                 {[
                                     { label: 'Manajemen User', href: '/dashboard/users' },
                                     { label: 'Divisi', href: '/dashboard/divisions' },
                                     { label: 'Kategori Berita', href: '/dashboard/categories' },
                                     { label: 'Tentang Kami', href: '/dashboard/abouts' },
                                 ].map((link) => (
-                                    <Button
-                                        key={link.label}
-                                        asChild
-                                        variant="ghost"
-                                        size="sm"
-                                        className="w-full justify-start text-muted-foreground"
-                                    >
+                                    <Button key={link.label} asChild variant="ghost" size="sm" className="text-muted-foreground w-full justify-start">
                                         <Link href={link.href}>{link.label}</Link>
                                     </Button>
                                 ))}

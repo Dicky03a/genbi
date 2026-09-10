@@ -32,7 +32,7 @@ class DivisionSeeder extends Seeder
             $division = Division::create($div);
 
             // Assign some random users to each division if they exist
-            $users = User::role('user')->whereNull('division_id')->limit(2)->get();
+            $users = User::role('anggota')->whereNull('division_id')->limit(2)->get();
             foreach ($users as $user) {
                 $user->update(['division_id' => $division->id]);
             }

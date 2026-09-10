@@ -1,21 +1,36 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
+    const isActive = (url: string) => url !== '#' && (page.url === url || page.url.startsWith(`${url}/`));
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel>Navigasi</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => {
                     const hasChildren = item.items && item.items.length > 0;
-                    
+
                     if (hasChildren) {
                         return (
-                            <Collapsible key={item.title} asChild defaultOpen={item.items?.some(sub => sub.url === page.url)} className="group/collapsible">
+                            <Collapsible
+                                key={item.title}
+                                asChild
+                                defaultOpen={item.items?.some((sub) => isActive(sub.url))}
+                                className="group/collapsible"
+                            >
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuButton tooltip={item.title}>
@@ -28,8 +43,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                         <SidebarMenuSub>
                                             {item.items?.map((subItem) => (
                                                 <SidebarMenuSubItem key={subItem.title}>
-                                                    <SidebarMenuSubButton asChild isActive={subItem.url === page.url}>
+                                                    <SidebarMenuSubButton asChild isActive={isActive(subItem.url)}>
                                                         <Link href={subItem.url}>
+                                                            {subItem.icon && <subItem.icon />}
                                                             <span>{subItem.title}</span>
                                                         </Link>
                                                     </SidebarMenuSubButton>
@@ -44,7 +60,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
                     return (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild isActive={item.url === page.url}>
+                            <SidebarMenuButton asChild isActive={isActive(item.url)}>
                                 <Link href={item.url} prefetch>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>

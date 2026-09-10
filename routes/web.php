@@ -1,16 +1,32 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\AttendanceVerificationController;
+use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\KomisariatController;
+use App\Http\Controllers\Admin\PeriodController;
+use App\Http\Controllers\Admin\PointCategoryController;
+use App\Http\Controllers\Admin\PointRateController;
+use App\Http\Controllers\Admin\RecapController;
+use App\Http\Controllers\Admin\SubmissionVerificationController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\BeasiswaController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PointController;
+use App\Http\Controllers\PointSubmissionController;
 use App\Http\Controllers\UserController;
+use App\Models\About;
+use App\Models\News;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $about = \App\Models\About::first();
-    $latestNews = \App\Models\News::with('category')->latest()->take(3)->get();
-    
+    $about = About::first();
+    $latestNews = News::with('category')->latest()->take(3)->get();
+
     return Inertia::render('app', [
         'about' => $about ? [
             'tagline' => $about->tagline,
@@ -23,7 +39,7 @@ Route::get('/', function () {
             'mission' => ['Mengembangkan potensi kepemimpinan.', 'Meningkatkan kepedulian sosial.', 'Menjadi agen perubahan.'],
             'profile' => 'GenBI adalah komunitas penerima beasiswa Bank Indonesia yang tersebar di seluruh perguruan tinggi di Indonesia.',
         ],
-        'latestNews' => $latestNews
+        'latestNews' => $latestNews,
     ]);
 })->name('home');
 
@@ -31,60 +47,88 @@ Route::get('profile', [AboutController::class, 'publicProfile'])->name('profile'
 Route::get('berita', [NewsController::class, 'publicIndex'])->name('berita.index');
 Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('berita.show');
 
-Route::get('beasiswa', [\App\Http\Controllers\BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
+Route::get('beasiswa', [BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
 
-Route::get('divisi', [\App\Http\Controllers\DivisionController::class, 'publicIndex'])->name('divisi.index');
-Route::get('divisi/{division}', [\App\Http\Controllers\DivisionController::class, 'publicShow'])->name('divisi.show');
+Route::get('divisi', [DivisionController::class, 'publicIndex'])->name('divisi.index');
+Route::get('divisi/{division}', [DivisionController::class, 'publicShow'])->name('divisi.show');
 
 Route::get('privacy-policy', fn() => Inertia::render('front/privacy-policy'))->name('privacy-policy');
 Route::get('terms-of-use', fn() => Inertia::render('front/terms-of-use'))->name('terms-of-use');
 Route::get('sitemap', fn() => Inertia::render('front/sitemap'))->name('sitemap');
 
 Route::middleware(['auth'])->group(function () {
-    Route::middleware('role:Superadmin|admin')->group(function () {
-        Route::get('dashboard', function () {
-            return Inertia::render('dashboard', [
-                'stats' => [
-                    'users'     => \App\Models\User::count(),
-                    'news'      => \App\Models\News::count(),
-                    'published' => \App\Models\News::where('status', 'published')->count(),
-                    'divisions' => \App\Models\Division::count(),
-                    'beasiswas' => \App\Models\Beasiswa::count(),
-                ],
-                'recentNews' => \App\Models\News::with(['category', 'author'])
-                    ->latest()
-                    ->take(5)
-                    ->get()
-                    ->map(fn($n) => [
-                        'id'           => $n->id,
-                        'title'        => $n->title,
-                        'slug'         => $n->slug,
-                        'status'       => $n->status,
-                        'category'     => $n->category?->name,
-                        'author'       => $n->author?->name,
-                        'published_at' => $n->published_at?->toDateString(),
-                        'created_at'   => $n->created_at->toDateString(),
-                    ]),
-            ]);
-        })->name('dashboard');
+    Route::middleware('role:admin_komisariat|admin_korkom|superadmin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('periode', [PeriodController::class, 'index'])->name('periods.index');
+        Route::post('periode', [PeriodController::class, 'store'])->name('periods.store');
+        Route::put('periode/{period}', [PeriodController::class, 'update'])->name('periods.update');
+        Route::post('periode/{period}/activate', [PeriodController::class, 'activate'])->name('periods.activate');
+        Route::delete('periode/{period}', [PeriodController::class, 'destroy'])->name('periods.destroy');
 
+        Route::get('komisariat', [KomisariatController::class, 'index'])->name('komisariats.index');
+        Route::post('komisariat', [KomisariatController::class, 'store'])->name('komisariats.store');
+        Route::put('komisariat/{komisariat}', [KomisariatController::class, 'update'])->name('komisariats.update');
+        Route::delete('komisariat/{komisariat}', [KomisariatController::class, 'destroy'])->name('komisariats.destroy');
+
+        Route::get('kategori-poin', [PointCategoryController::class, 'index'])->name('point-categories.index');
+        Route::post('kategori-poin', [PointCategoryController::class, 'store'])->name('point-categories.store');
+        Route::put('kategori-poin/{pointCategory}', [PointCategoryController::class, 'update'])->name('point-categories.update');
+        Route::delete('kategori-poin/{pointCategory}', [PointCategoryController::class, 'destroy'])->name('point-categories.destroy');
+
+        Route::get('tarif-poin', [PointRateController::class, 'index'])->name('point-rates.index');
+        Route::post('tarif-poin', [PointRateController::class, 'store'])->name('point-rates.store');
+        Route::put('tarif-poin/{pointRate}', [PointRateController::class, 'update'])->name('point-rates.update');
+        Route::delete('tarif-poin/{pointRate}', [PointRateController::class, 'destroy'])->name('point-rates.destroy');
+
+        Route::get('acara', [EventController::class, 'index'])->name('events.index');
+        Route::get('acara/buat', [EventController::class, 'create'])->name('events.create');
+        Route::post('acara', [EventController::class, 'store'])->name('events.store');
+        Route::get('acara/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+        Route::put('acara/{event}', [EventController::class, 'update'])->name('events.update');
+        Route::post('acara/{event}/status', [EventController::class, 'status'])->name('events.status');
+        Route::get('absensi', [AttendanceVerificationController::class, 'index'])->name('attendances.index');
+        Route::patch('absensi/{attendance}/verifikasi', [AttendanceVerificationController::class, 'verify'])->name('attendances.verify');
+        Route::patch('absensi/{attendance}/tolak', [AttendanceVerificationController::class, 'reject'])->name('attendances.reject');
+        Route::get('pengajuan', [SubmissionVerificationController::class, 'index'])->name('submissions.index');
+        Route::patch('pengajuan/{submission}/verifikasi', [SubmissionVerificationController::class, 'verify'])->name('submissions.verify');
+        Route::patch('pengajuan/{submission}/tolak', [SubmissionVerificationController::class, 'reject'])->name('submissions.reject');
+        Route::get('rekap', [RecapController::class, 'index'])->name('recap.index');
+        Route::get('rekap/ekspor', [RecapController::class, 'export'])->name('recap.export');
+    });
+
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('acara', [App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+    Route::get('acara/{event:slug}', [App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+    Route::get('acara/{event:slug}/absensi', [AttendanceController::class, 'create'])->name('events.attendance.create');
+    Route::post('acara/{event}/absensi', [AttendanceController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('events.attendances.store');
+
+    Route::get('pengajuan', [PointSubmissionController::class, 'index'])->name('submissions.index');
+    Route::get('pengajuan/buat', [PointSubmissionController::class, 'create'])->name('submissions.create');
+    Route::post('pengajuan', [PointSubmissionController::class, 'store'])->name('submissions.store');
+    Route::get('pengajuan/{submission}/revisi', [PointSubmissionController::class, 'edit'])->name('submissions.edit');
+    Route::put('pengajuan/{submission}', [PointSubmissionController::class, 'update'])->name('submissions.update');
+    Route::get('poin', [PointController::class, 'index'])->name('points.index');
+
+    Route::middleware('role:admin_komisariat|admin_korkom|superadmin|Superadmin|admin')->group(function () {
         Route::resource('dashboard/categories', CategoryController::class)->names('categories');
         Route::resource('dashboard/news', NewsController::class)->names('news');
         Route::resource('dashboard/abouts', AboutController::class)->names('abouts');
 
-        Route::resource('dashboard/divisions', \App\Http\Controllers\DivisionController::class)->names('divisions');
-        Route::post('dashboard/divisions/{division}/assign-user', [\App\Http\Controllers\DivisionController::class, 'assignUser'])->name('divisions.assign-user');
-        Route::post('dashboard/divisions/{division}/remove-user', [\App\Http\Controllers\DivisionController::class, 'removeUser'])->name('divisions.remove-user');
+        Route::resource('dashboard/divisions', DivisionController::class)->names('divisions');
+        Route::post('dashboard/divisions/{division}/assign-user', [DivisionController::class, 'assignUser'])->name('divisions.assign-user');
+        Route::post('dashboard/divisions/{division}/remove-user', [DivisionController::class, 'removeUser'])->name('divisions.remove-user');
 
-        Route::resource('dashboard/beasiswas', \App\Http\Controllers\BeasiswaController::class)->names('beasiswas');
+        Route::resource('dashboard/beasiswas', BeasiswaController::class)->names('beasiswas');
 
         Route::resource('dashboard/users', UserController::class)->names('users');
     });
 
     Route::get('user/dashboard', function () {
         return Inertia::render('user/dashboard');
-    })->middleware('role:user')->name('user.dashboard');
+    })->middleware('role:anggota|user')->name('user.dashboard');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

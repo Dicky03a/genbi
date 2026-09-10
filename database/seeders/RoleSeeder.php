@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
@@ -13,8 +13,43 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'Superadmin']);
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'user']);
+        $permissionNames = [
+            'manage_master_data',
+            'manage_events',
+            'verify_attendance',
+            'verify_submissions',
+            'view_recap',
+            'manage_transactions',
+        ];
+        $permissions = [];
+        foreach ($permissionNames as $permissionName) {
+            $permissions[$permissionName] = Permission::findOrCreate($permissionName, 'web');
+        }
+
+        $roles = [
+            'superadmin' => $permissionNames,
+            'admin_korkom' => [
+                'manage_events',
+                'verify_attendance',
+                'verify_submissions',
+                'view_recap',
+                'manage_transactions',
+            ],
+            'admin_komisariat' => [
+                'manage_events',
+                'verify_attendance',
+                'verify_submissions',
+                'view_recap',
+            ],
+            'anggota' => ['view_recap'],
+        ];
+
+        foreach ($roles as $name => $rolePermissions) {
+            $role = Role::findOrCreate($name, 'web');
+            $role->syncPermissions(array_map(
+                fn (string $permission) => $permissions[$permission],
+                $rolePermissions,
+            ));
+        }
     }
 }

@@ -9,9 +9,7 @@ import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/user/dashboard' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: '/user/dashboard' }];
 
 interface InfoRowProps {
     icon: React.ReactNode;
@@ -19,21 +17,28 @@ interface InfoRowProps {
     value: string | null | undefined;
 }
 
+interface DashboardProps {
+    recap?: {
+        period: { name: string };
+        total_points: number;
+        progress: { percentage: number; target_points: number; achieved: boolean };
+    } | null;
+    openEvents?: { id: number; slug: string; title: string; starts_at: string; komisariat: { name: string } | null }[];
+}
+
 function InfoRow({ icon, label, value }: InfoRowProps) {
     return (
         <div className="flex items-start gap-3 border-b py-3 last:border-0">
-            <div className="mt-0.5 text-muted-foreground">{icon}</div>
+            <div className="text-muted-foreground mt-0.5">{icon}</div>
             <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className={`truncate text-sm font-medium ${!value ? 'italic text-muted-foreground' : ''}`}>
-                    {value || 'Belum diisi'}
-                </p>
+                <p className="text-muted-foreground text-xs">{label}</p>
+                <p className={`truncate text-sm font-medium ${!value ? 'text-muted-foreground italic' : ''}`}>{value || 'Belum diisi'}</p>
             </div>
         </div>
     );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ recap, openEvents = [] }: DashboardProps) {
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
     const getInitials = useInitials();
@@ -51,10 +56,7 @@ export default function Dashboard() {
                 <Card>
                     <CardContent className="flex flex-col items-center gap-5 pt-6 sm:flex-row sm:items-start">
                         <Avatar className="h-20 w-20 shrink-0">
-                            <AvatarImage
-                                src={user.avatar ? `/storage/${user.avatar}` : undefined}
-                                alt={user.name}
-                            />
+                            <AvatarImage src={user.avatar ? `/storage/${user.avatar}` : undefined} alt={user.name} />
                             <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
 
@@ -84,6 +86,46 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
 
+                {recap && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Progress poin {recap.period.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="flex items-end justify-between">
+                                <span className="text-3xl font-bold">{recap.total_points}</span>
+                                <span className="text-muted-foreground text-sm">/ {recap.progress.target_points} poin</span>
+                            </div>
+                            <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                                <div className="bg-primary h-full rounded-full" style={{ width: `${recap.progress.percentage}%` }} />
+                            </div>
+                            <p className="text-muted-foreground text-sm">
+                                {recap.progress.achieved ? 'Target periode tercapai.' : `${recap.progress.percentage}% dari target periode.`}
+                            </p>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {openEvents.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Acara yang sedang dibuka</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            {openEvents.map((event) => (
+                                <Link
+                                    key={event.id}
+                                    href={`/acara/${event.slug}`}
+                                    className="hover:bg-muted/30 flex justify-between rounded border p-3 text-sm"
+                                >
+                                    <span>{event.title}</span>
+                                    <span className="text-muted-foreground">{event.komisariat?.name ?? 'Semua komisariat'}</span>
+                                </Link>
+                            ))}
+                        </CardContent>
+                    </Card>
+                )}
+
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Profile detail */}
                     <div className="lg:col-span-2">
@@ -109,14 +151,13 @@ export default function Dashboard() {
                         <CardContent className="space-y-4">
                             <div className="flex items-end justify-between">
                                 <span className="text-3xl font-bold">{completionPct}%</span>
-                                <span className="text-sm text-muted-foreground">{filledCount} / {profileFields.length} field</span>
+                                <span className="text-muted-foreground text-sm">
+                                    {filledCount} / {profileFields.length} field
+                                </span>
                             </div>
 
-                            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                                <div
-                                    className="h-full rounded-full bg-primary transition-all"
-                                    style={{ width: `${completionPct}%` }}
-                                />
+                            <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                                <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${completionPct}%` }} />
                             </div>
 
                             <ul className="space-y-1.5 text-sm">
