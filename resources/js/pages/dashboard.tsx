@@ -55,7 +55,7 @@ const statCards = (stats: Stats) => [
         icon: Users,
         href: '/dashboard/users',
         color: 'text-blue-600',
-        bg: 'bg-blue-50 dark:bg-blue-950',
+        bg: 'bg-blue-50',
     },
     {
         title: 'Total Berita',
@@ -63,7 +63,7 @@ const statCards = (stats: Stats) => [
         icon: Newspaper,
         href: '/dashboard/news',
         color: 'text-orange-600',
-        bg: 'bg-orange-50 dark:bg-orange-950',
+        bg: 'bg-orange-50',
         sub: `${stats.published} terbit`,
     },
     {
@@ -72,7 +72,7 @@ const statCards = (stats: Stats) => [
         icon: Layers,
         href: '/dashboard/divisions',
         color: 'text-purple-600',
-        bg: 'bg-purple-50 dark:bg-purple-950',
+        bg: 'bg-purple-50',
     },
     {
         title: 'Info Beasiswa',
@@ -80,7 +80,7 @@ const statCards = (stats: Stats) => [
         icon: GraduationCap,
         href: '/dashboard/beasiswas',
         color: 'text-green-600',
-        bg: 'bg-green-50 dark:bg-green-950',
+        bg: 'bg-green-50',
     },
 ];
 

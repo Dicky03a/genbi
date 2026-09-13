@@ -1,18 +1,8 @@
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
-import { 
-  Bold, 
-  Italic, 
-  Underline as UnderlineIcon, 
-  List, 
-  ListOrdered, 
-  Quote, 
-  Undo, 
-  Redo,
-  Link as LinkIcon
-} from 'lucide-react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Bold, Italic, List, ListOrdered, Quote, Redo, Underline as UnderlineIcon, Undo } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface RichTextEditorProps {
@@ -81,20 +71,10 @@ const MenuBar = ({ editor }: { editor: any }) => {
             >
                 <Quote className="h-4 w-4" />
             </Button>
-            <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().undo().run()}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()}>
                 <Undo className="h-4 w-4" />
             </Button>
-            <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => editor.chain().focus().redo().run()}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()}>
                 <Redo className="h-4 w-4" />
             </Button>
         </div>
@@ -116,13 +96,13 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm dark:prose-invert focus:outline-none min-h-[200px] p-4 max-w-none',
+                class: 'prose prose-sm focus:outline-none min-h-[200px] p-4 max-w-none',
             },
         },
     });
 
     return (
-        <div className="rounded-md border bg-background overflow-hidden">
+        <div className="bg-background overflow-hidden rounded-md border">
             <MenuBar editor={editor} />
             <EditorContent editor={editor} />
         </div>

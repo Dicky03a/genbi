@@ -5,20 +5,19 @@ interface HomeProps {
 export function HomeSection({ tagline: _tagline }: HomeProps) {
     return (
         <section className="relative mb-3 px-4 pt-4 sm:px-6 md:px-8 md:pt-6">
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[24px] shadow-[0_10px_40px_rgba(0,0,0,0.08)] md:aspect-[21/9]">
+            <div className="relative aspect-[12/5] w-full overflow-hidden rounded-[24px] bg-black shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
                 {/* Hero Image - Responsive srcset for fast loading */}
                 <picture>
-                    <source media="(max-width: 768px)" srcSet="/asset/foto/home-768.webp" />
-                    <source media="(max-width: 1200px)" srcSet="/asset/foto/home-1200.webp" />
                     <img
-                        src="/asset/foto/home-1920.webp"
+                        src="/asset/foto/Banner Web.webp"
                         alt="GenBI Hero"
-                        className="h-full w-full object-cover"
+                        className="block h-full w-full object-contain object-center"
                         loading="eager"
                         fetchPriority="high"
                         decoding="async"
+                        sizes="100vw"
                         width={1920}
-                        height={1280}
+                        height={800}
                     />
                 </picture>
 

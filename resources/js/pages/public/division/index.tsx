@@ -1,12 +1,11 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { useGSAP } from '@gsap/react';
 import { Head, Link } from '@inertiajs/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useRef } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,7 +53,7 @@ export default function DivisionIndex({ divisions }: Props) {
                 gsap.to('.division-card', {
                     y: 0,
                     opacity: 1,
-                    duration: 0.8,
+                    duration: 0.2,
                     stagger: 0.1,
                     delay: 0.4,
                     ease: 'power2.out',
@@ -64,9 +63,7 @@ export default function DivisionIndex({ divisions }: Props) {
         { scope: containerRef, dependencies: [divisions] },
     );
 
-    const breadcrumbs = [
-        { title: 'Divisi', href: '/divisi' },
-    ];
+    const breadcrumbs = [{ title: 'Divisi', href: '/divisi' }];
 
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -94,10 +91,10 @@ export default function DivisionIndex({ divisions }: Props) {
                 {/* Hero Section */}
                 <section className="py-[44px] md:py-[120px]">
                     <div className="mx-auto max-w-[980px] px-6 text-center">
-                        <h1 className="hero-title text-[30px] font-semibold leading-[1.07] tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
+                        <h1 className="hero-title text-[30px] leading-[1.07] font-semibold tracking-[-0.02em] text-[#1d1d1f] md:text-[56px] lg:tracking-[-0.28px]">
                             Struktur Divisi.
                         </h1>
-                        <p className="hero-text mt-5 text-[17px] leading-[1.47] text-[#1d1d1f] md:mt-8 md:text-[24px] md:font-light md:leading-[1.5]">
+                        <p className="hero-text mt-5 text-[17px] leading-[1.47] text-[#1d1d1f] md:mt-8 md:text-[24px] md:leading-[1.5] md:font-light">
                             Mengenal lebih dekat bagian-bagian yang menggerakkan organisasi kami.
                         </p>
                     </div>
@@ -133,13 +130,13 @@ export default function DivisionIndex({ divisions }: Props) {
                                             <h2 className="mb-3 text-[18px] font-semibold tracking-tight text-[#1d1d1f] md:mb-4 md:text-[24px]">
                                                 {item.name}
                                             </h2>
-                                            <p className="mb-5 flex-1 text-[15px] leading-relaxed text-[#7a7a7a] line-clamp-3 md:mb-8 md:text-[17px]">
+                                            <p className="mb-5 line-clamp-3 flex-1 text-[15px] leading-relaxed text-[#7a7a7a] md:mb-8 md:text-[17px]">
                                                 {item.keterangan}
                                             </p>
                                             <div className="mt-auto">
-                                                <Link 
+                                                <Link
                                                     href={route('divisi.show', item.id)}
-                                                    className="inline-flex h-[44px] items-center rounded-full bg-[#0066cc] px-6 text-[15px] font-medium text-white transition-all hover:bg-[#0071e3] active:scale-95 gap-2"
+                                                    className="inline-flex h-[44px] items-center gap-2 rounded-full bg-[#0066cc] px-6 text-[15px] font-medium text-white transition-all hover:bg-[#0071e3] active:scale-95"
                                                 >
                                                     Detail Divisi
                                                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
