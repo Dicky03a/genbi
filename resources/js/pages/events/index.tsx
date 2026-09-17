@@ -13,6 +13,7 @@ type EventItem = {
     starts_at: string;
     komisariat: { name: string } | null;
     my_attendance_status?: string | null;
+    poster_url?: string;
 };
 
 export default function EventsIndex({ events }: { events: EventItem[] }) {
@@ -59,8 +60,13 @@ export default function EventsIndex({ events }: { events: EventItem[] }) {
                         <p className="text-sm text-muted-foreground py-4 col-span-2">Belum ada acara yang dibuka.</p>
                     ) : (
                         events.map((event) => (
-                            <Card key={event.id} className="hover:shadow-md transition">
-                                <CardHeader className="pb-3">
+                            <Card key={event.id} className="hover:shadow-md transition overflow-hidden">
+                                {event.poster_url && (
+                                    <div className="w-full h-40 bg-slate-100 overflow-hidden">
+                                        <img src={event.poster_url} className="w-full h-full object-cover transition-transform hover:scale-105" alt="Poster Acara" />
+                                    </div>
+                                )}
+                                <CardHeader className="pb-3 pt-5">
                                     <div className="flex justify-between items-start gap-2">
                                         <CardTitle className="text-lg font-bold text-black dark:text-white">
                                             {event.title}

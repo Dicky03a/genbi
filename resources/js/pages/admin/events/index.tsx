@@ -13,6 +13,7 @@ type EventItem = {
     starts_at: string;
     komisariat: { name: string } | null;
     roles: { id: number; name: string; points: number }[];
+    poster_url?: string;
 };
 
 export default function EventsIndex({ events }: { events: EventItem[] }) {
@@ -62,15 +63,22 @@ export default function EventsIndex({ events }: { events: EventItem[] }) {
                         events.map((event) => (
                             <Card key={event.id} className="border border-slate-200 bg-white shadow-sm hover:shadow transition">
                                 <CardHeader className="bg-slate-50/60 border-b border-slate-100 pb-3">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                        <div>
-                                            <CardTitle className="text-lg font-bold text-slate-900">{event.title}</CardTitle>
-                                            <p className="text-xs text-slate-500 flex items-center gap-2 mt-1">
-                                                <Tag className="w-3.5 h-3.5 text-indigo-500" />
-                                                <span>{event.komisariat?.name ?? 'Kategori Semua Komisariat'}</span>
-                                                <span>•</span>
-                                                <span>Waktu: {event.starts_at}</span>
-                                            </p>
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            {event.poster_url && (
+                                                <div className="w-12 h-12 rounded-lg bg-slate-200 overflow-hidden shrink-0 border border-slate-200">
+                                                    <img src={event.poster_url} className="w-full h-full object-cover" alt="Poster" />
+                                                </div>
+                                            )}
+                                            <div>
+                                                <CardTitle className="text-lg font-bold text-slate-900">{event.title}</CardTitle>
+                                                <p className="text-xs text-slate-500 flex items-center gap-2 mt-1">
+                                                    <Tag className="w-3.5 h-3.5 text-indigo-500" />
+                                                    <span>{event.komisariat?.name ?? 'Kategori Semua Komisariat'}</span>
+                                                    <span>•</span>
+                                                    <span>Waktu: {event.starts_at}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                         <div>{getStatusBadge(event.status)}</div>
                                     </div>

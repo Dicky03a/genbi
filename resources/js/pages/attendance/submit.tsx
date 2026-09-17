@@ -9,16 +9,18 @@ import { Camera, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
 type EventRole = { id: number; name: string; points: number };
-type Event = { id: number; title: string; roles: EventRole[] };
+type PointRate = { id: number; name: string; points: number };
+type Event = { id: number; title: string; roles: EventRole[]; point_type: string };
 type MyAttendance = {
     id: number;
     status: string;
     event_role: { name: string; points: number } | null;
+    point_rate: { name: string; points: number } | null;
     created_at: string;
     photo_path: string;
 };
 
-export default function AttendanceSubmit({ event, myAttendance }: { event: Event; myAttendance?: MyAttendance | null }) {
+export default function AttendanceSubmit({ event, myAttendance, pointRates }: { event: Event; myAttendance?: MyAttendance | null; pointRates?: PointRate[] | null }) {
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [cameraError, setCameraError] = useState('');
@@ -30,6 +32,7 @@ export default function AttendanceSubmit({ event, myAttendance }: { event: Event
 
     const { data, setData, errors, setError, clearErrors, reset } = useForm({
         event_role_id: '',
+        point_rate_id: '',
         photo: null as File | null,
     });
 
@@ -170,8 +173,13 @@ export default function AttendanceSubmit({ event, myAttendance }: { event: Event
         setStatusMessage('');
         clearErrors();
 
-        if (!data.event_role_id) {
+        if (event.point_type === 'role' && !data.event_role_id) {
             setError('event_role_id', 'Peran wajib dipilih.');
+            return;
+        }
+
+        if (event.point_type === 'point_rate' && !data.point_rate_id) {
+            setError('point_rate_id', 'Tarif Poin wajib dipilih.');
             return;
         }
 
@@ -191,7 +199,11 @@ export default function AttendanceSubmit({ event, myAttendance }: { event: Event
         const csrfToken = csrfMeta || (xsrfCookie ? decodeURIComponent(xsrfCookie) : '');
 
         const payload = new FormData();
-        payload.append('event_role_id', data.event_role_id);
+        if (event.point_type === 'role') {
+            payload.append('event_role_id', data.event_role_id);
+        } else if (event.point_type === 'point_rate') {
+            payload.append('point_rate_id', data.point_rate_id);
+        }
         payload.append('photo', data.photo);
         if (csrfToken) {
             payload.append('_token', csrfToken);
@@ -269,9 +281,9 @@ export default function AttendanceSubmit({ event, myAttendance }: { event: Event
                                         {getStatusBadge(myAttendance.status)}
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
-                                        <span className="text-muted-foreground">Peran Kehadiran</span>
+                                        <span className="text-muted-foreground">Klaim Poin</span>
                                         <span className="font-semibold text-black dark:text-white">
-                                            {myAttendance.event_role ? `${myAttendance.event_role.name} (${myAttendance.event_role.points} poin)` : '-'}
+                                            {myAttendance.event_role ? `${myAttendance.event_role.name} (${myAttendance.event_role.points} poin)` : myAttendance.point_rate ? `${myAttendance.point_rate.name} (${myAttendance.point_rate.points} poin)` : '-'}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
@@ -304,26 +316,50 @@ export default function AttendanceSubmit({ event, myAttendance }: { event: Event
                             </div>
                         ) : (
                             <form onSubmit={submit} className="space-y-6">
-                            {/* Role Selector */}
-                            <div>
-                                <Label htmlFor="event_role_id" className="font-medium">
-                                    Peran Kehadiran <span className="text-red-500">*</span>
-                                </Label>
-                                <select
-                                    id="event_role_id"
-                                    className="border-input bg-background text-black mt-1.5 flex h-10 w-full rounded-md border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                                    value={data.event_role_id}
-                                    onChange={(e) => setData('event_role_id', e.target.value)}
-                                >
-                                    <option value="" className="text-black">Pilih Peran</option>
-                                    {event.roles.map((role) => (
-                                        <option key={role.id} value={role.id} className="text-black">
-                                            {role.name} ({role.points} poin)
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.event_role_id} />
-                            </div>
+                            {/* Role / Point Rate Selector */}
+                            {event.point_type === 'role' ? (
+                                <div>
+                                    <Label htmlFor="event_role_id" className="font-medium">
+                                        Peran Kehadiran <span className="text-red-500">*</span>
+                                    </Label>
+                                    <select
+                                        id="event_role_id"
+                                        className="border-input bg-background text-black mt-1.5 flex h-10 w-full rounded-md border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value={data.event_role_id}
+                                        onChange={(e) => setData('event_role_id', e.target.value)}
+                                    >
+                                        <option value="" className="text-black">Pilih Peran</option>
+                                        {event.roles.map((role) => (
+                                            <option key={role.id} value={role.id} className="text-black">
+                                                {role.name} ({role.points} poin)
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {/* @ts-ignore */}
+                                    <InputError message={errors.event_role_id} />
+                                </div>
+                            ) : (
+                                <div>
+                                    <Label htmlFor="point_rate_id" className="font-medium">
+                                        Tarif Poin <span className="text-red-500">*</span>
+                                    </Label>
+                                    <select
+                                        id="point_rate_id"
+                                        className="border-input bg-background text-black mt-1.5 flex h-10 w-full rounded-md border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value={data.point_rate_id}
+                                        onChange={(e) => setData('point_rate_id', e.target.value)}
+                                    >
+                                        <option value="" className="text-black">Pilih Tarif Poin</option>
+                                        {pointRates?.map((rate) => (
+                                            <option key={rate.id} value={rate.id} className="text-black">
+                                                {rate.name} ({rate.points} poin)
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {/* @ts-ignore */}
+                                    <InputError message={errors.point_rate_id} />
+                                </div>
+                            )}
 
                             {/* Camera / Selfie Capture Area */}
                             <div className="space-y-3">

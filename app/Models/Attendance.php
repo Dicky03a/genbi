@@ -45,6 +45,11 @@ class Attendance extends Model
         return $this->belongsTo(EventRole::class);
     }
 
+    public function pointRate(): BelongsTo
+    {
+        return $this->belongsTo(PointRate::class);
+    }
+
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');

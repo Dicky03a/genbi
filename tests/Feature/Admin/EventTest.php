@@ -27,8 +27,6 @@ function eventPayload(int $komisariatId): array
         'description' => 'Pelatihan anggota.',
         'starts_at' => '2026-09-10 09:00:00',
         'ends_at' => '2026-09-10 12:00:00',
-        'opens_at' => '2026-09-10 08:30:00',
-        'closes_at' => '2026-09-10 12:30:00',
     ];
 }
 

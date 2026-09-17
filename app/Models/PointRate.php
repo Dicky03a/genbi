@@ -30,4 +30,9 @@ class PointRate extends Model
     {
         return $this->belongsTo(PointCategory::class);
     }
+
+    public function events(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_point_rate');
+    }
 }

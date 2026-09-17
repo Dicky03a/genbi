@@ -13,14 +13,13 @@ class Event extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $appends = ['poster_url'];
 
     protected function casts(): array
     {
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
-            'opens_at' => 'datetime',
-            'closes_at' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'radius_m' => 'integer',
@@ -28,12 +27,14 @@ class Event extends Model
         ];
     }
 
+    public function getPosterUrlAttribute(): ?string
+    {
+        return $this->poster_path ? \Illuminate\Support\Facades\Storage::url($this->poster_path) : null;
+    }
+
     public function scopeOpenForAttendance(Builder $query): Builder
     {
-        return $query
-            ->where('status', 'dibuka')
-            ->where('opens_at', '<=', now())
-            ->where('closes_at', '>=', now());
+        return $query->where('status', 'dibuka');
     }
 
     public function period(): BelongsTo
@@ -54,6 +55,11 @@ class Event extends Model
     public function roles(): HasMany
     {
         return $this->hasMany(EventRole::class);
+    }
+
+    public function pointRates(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(PointRate::class, 'event_point_rate');
     }
 
     public function attendances(): HasMany

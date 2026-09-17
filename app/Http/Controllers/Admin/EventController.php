@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreEventRequest;
 use App\Http\Requests\Admin\UpdateEventRequest;
 use App\Models\Event;
 use App\Models\Komisariat;
+use App\Models\PointRate;
 use App\Services\EventService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -32,13 +33,14 @@ class EventController extends Controller
 
         return Inertia::render('admin/events/form', [
             'komisariats' => Komisariat::query()->active()->orderBy('name')->get(['id', 'name']),
+            'availablePointRates' => PointRate::active()->get(['id', 'name', 'points']),
         ]);
     }
 
     public function store(StoreEventRequest $request): RedirectResponse
     {
         try {
-            $this->service->create($request->user(), $request->validated(), $request->validated('roles'));
+            $this->service->create($request->user(), $request->validated(), $request->validated('roles') ?? []);
         } catch (DomainException $exception) {
             return back()->withInput()->withErrors(['event' => $exception->getMessage()]);
         }
@@ -51,8 +53,9 @@ class EventController extends Controller
         Gate::authorize('update', $event);
 
         return Inertia::render('admin/events/form', [
-            'event' => $event->load('roles'),
+            'event' => $event->load(['roles', 'pointRates']),
             'komisariats' => Komisariat::query()->active()->orderBy('name')->get(['id', 'name']),
+            'availablePointRates' => PointRate::active()->get(['id', 'name', 'points']),
         ]);
     }
 
@@ -61,7 +64,7 @@ class EventController extends Controller
         Gate::authorize('update', $event);
 
         try {
-            $this->service->update($event, $request->user(), $request->validated(), $request->validated('roles'));
+            $this->service->update($event, $request->user(), $request->validated(), $request->validated('roles') ?? []);
         } catch (DomainException $exception) {
             return back()->withInput()->withErrors(['event' => $exception->getMessage()]);
         }

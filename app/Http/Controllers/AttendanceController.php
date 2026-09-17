@@ -48,14 +48,23 @@ class AttendanceController extends Controller
             ->where('user_id', $request->user()->id)
             ->first();
 
+        $pointRates = $event->point_type === 'point_rate' 
+            ? $event->pointRates()->with('pointCategory')->get()
+            : null;
+
         return Inertia::render('attendance/submit', [
             'event' => $event->load('roles'),
+            'pointRates' => $pointRates,
             'myAttendance' => $myAttendance ? [
                 'id' => $myAttendance->id,
                 'status' => $myAttendance->status,
                 'event_role' => $myAttendance->eventRole ? [
                     'name' => $myAttendance->eventRole->name,
                     'points' => $myAttendance->eventRole->points,
+                ] : null,
+                'point_rate' => $myAttendance->pointRate ? [
+                    'name' => $myAttendance->pointRate->name,
+                    'points' => $myAttendance->pointRate->points,
                 ] : null,
                 'created_at' => $myAttendance->created_at->format('d M Y H:i'),
                 'photo_path' => $myAttendance->photo_path,

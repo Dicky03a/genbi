@@ -29,18 +29,29 @@ class EventService
         $this->assertDateWindow($data);
 
         return DB::transaction(function () use ($actor, $data, $roles): Event {
-            unset($data['roles']);
+            $pointRateIds = $data['point_rate_ids'] ?? [];
+            unset($data['roles'], $data['point_rate_ids']);
             $data['period_id'] = app(PeriodResolver::class)
                 ->forDate(now()->parse($data['starts_at']))
                 ->id;
             $data['created_by'] = $actor->id;
             $data['slug'] = $this->uniqueSlug($data['title']);
-            $data['status'] = 'draft';
+            $data['status'] = !empty($data['is_open']) ? 'dibuka' : 'draft';
+            unset($data['is_open']);
+
+            if (isset($data['poster']) && $data['poster'] instanceof \Illuminate\Http\UploadedFile) {
+                $data['poster_path'] = $data['poster']->storePublicly('events/posters', 'public');
+            }
+            unset($data['poster']);
 
             $event = Event::create($data);
-            $event->roles()->createMany($roles);
+            if (($data['point_type'] ?? 'role') === 'role' && !empty($roles)) {
+                $event->roles()->createMany($roles);
+            } elseif (($data['point_type'] ?? 'role') === 'point_rate') {
+                $event->pointRates()->sync($pointRateIds);
+            }
 
-            return $event->load(['period', 'komisariat', 'roles']);
+            return $event->load(['period', 'komisariat', 'roles', 'pointRates']);
         });
     }
 
@@ -50,16 +61,41 @@ class EventService
         $this->assertDateWindow($data);
 
         return DB::transaction(function () use ($event, $data, $roles): Event {
-            unset($data['roles']);
+            $pointRateIds = $data['point_rate_ids'] ?? [];
+            unset($data['roles'], $data['point_rate_ids']);
             $data['period_id'] = app(PeriodResolver::class)
                 ->forDate(now()->parse($data['starts_at']))
                 ->id;
             $data['slug'] = $event->slug;
+            
+            if ($event->status !== 'selesai') {
+                $data['status'] = !empty($data['is_open']) ? 'dibuka' : 'ditutup';
+            }
+            unset($data['is_open']);
+
+            if (array_key_exists('poster', $data)) {
+                if ($data['poster'] instanceof \Illuminate\Http\UploadedFile) {
+                    if ($event->poster_path) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($event->poster_path);
+                    }
+                    $data['poster_path'] = $data['poster']->storePublicly('events/posters', 'public');
+                } elseif ($data['poster'] === null && $event->poster_path) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($event->poster_path);
+                    $data['poster_path'] = null;
+                }
+            }
+            unset($data['poster']);
+
             $event->update($data);
             $event->roles()->delete();
-            $event->roles()->createMany($roles);
+            if (($data['point_type'] ?? 'role') === 'role' && !empty($roles)) {
+                $event->roles()->createMany($roles);
+                $event->pointRates()->sync([]);
+            } elseif (($data['point_type'] ?? 'role') === 'point_rate') {
+                $event->pointRates()->sync($pointRateIds);
+            }
 
-            return $event->refresh()->load(['period', 'komisariat', 'roles']);
+            return $event->refresh()->load(['period', 'komisariat', 'roles', 'pointRates']);
         });
     }
 
@@ -91,15 +127,9 @@ class EventService
     {
         $startsAt = now()->parse($data['starts_at']);
         $endsAt = now()->parse($data['ends_at']);
-        $opensAt = now()->parse($data['opens_at']);
-        $closesAt = now()->parse($data['closes_at']);
 
         if ($startsAt->greaterThanOrEqualTo($endsAt)) {
             throw new DomainException('Waktu mulai acara harus sebelum waktu selesai.');
-        }
-
-        if ($opensAt->greaterThanOrEqualTo($closesAt)) {
-            throw new DomainException('Jendela absensi harus memiliki waktu mulai dan selesai yang valid.');
         }
     }
 

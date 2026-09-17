@@ -27,16 +27,14 @@ class AttendanceService
             throw new DomainException('Absensi acara ini belum dibuka.');
         }
 
-        $now = now();
-        if ($now->lt($event->opens_at)) {
-            throw new DomainException('Absensi belum dibuka.');
-        }
-        if ($now->gt($event->closes_at)) {
-            throw new DomainException('Absensi sudah ditutup.');
-        }
-
-        if (! EventRole::query()->whereKey($data['event_role_id'])->where('event_id', $event->id)->exists()) {
-            throw new DomainException('Peran acara tidak valid.');
+        if ($event->point_type === 'point_rate') {
+            if (! $event->pointRates()->whereKey($data['point_rate_id'] ?? null)->exists()) {
+                throw new DomainException('Tarif poin tidak valid untuk acara ini.');
+            }
+        } else {
+            if (! EventRole::query()->whereKey($data['event_role_id'] ?? null)->where('event_id', $event->id)->exists()) {
+                throw new DomainException('Peran acara tidak valid.');
+            }
         }
 
         if (! $photo->isValid() || ! str_starts_with((string) $photo->getMimeType(), 'image/')) {
@@ -55,6 +53,7 @@ class AttendanceService
                     'event_id' => $event->id,
                     'user_id' => $user->id,
                     'event_role_id' => $data['event_role_id'] ?? null,
+                    'point_rate_id' => $data['point_rate_id'] ?? null,
                     'captured_lat' => null,
                     'captured_lng' => null,
                     'gps_accuracy_m' => null,
@@ -85,15 +84,27 @@ class AttendanceService
     {
         $this->verificationState->assertCanTransition($attendance->status, 'disetujui');
 
-        $attendance->loadMissing(['user', 'eventRole']);
-        if (! $attendance->eventRole) {
+        $isPointRate = $attendance->event->point_type === 'point_rate';
+        $relationsToLoad = $isPointRate ? ['user', 'pointRate.pointCategory'] : ['user', 'eventRole'];
+        $attendance->loadMissing($relationsToLoad);
+
+        if ($isPointRate && ! $attendance->pointRate) {
+            throw new DomainException('Tarif poin untuk absensi belum dipilih.');
+        }
+        if (! $isPointRate && ! $attendance->eventRole) {
             throw new DomainException('Peran acara untuk absensi belum dipilih.');
         }
 
-        return DB::transaction(function () use ($attendance, $actor): Attendance {
-            $category = PointCategory::query()->where('slug', 'kegiatan-organisasi')->first();
-            if (! $category) {
-                throw new DomainException('Kategori poin kegiatan organisasi belum tersedia.');
+        return DB::transaction(function () use ($attendance, $actor, $isPointRate): Attendance {
+            if ($isPointRate) {
+                $category = $attendance->pointRate->pointCategory;
+                $points = $attendance->pointRate->points;
+            } else {
+                $category = PointCategory::query()->where('slug', 'kegiatan-organisasi')->first();
+                if (! $category) {
+                    throw new DomainException('Kategori poin kegiatan organisasi belum tersedia.');
+                }
+                $points = $attendance->eventRole->points;
             }
 
             $this->ledger->record(
@@ -102,7 +113,7 @@ class AttendanceService
                 $attendance->event->period,
                 'absensi',
                 $attendance->id,
-                $attendance->eventRole->points,
+                $points,
                 $actor,
                 "Absensi acara: {$attendance->event->title}",
             );

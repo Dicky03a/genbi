@@ -23,6 +23,7 @@ type Event = {
     ends_at: string;
     komisariat: { name: string } | null;
     roles: EventRole[];
+    poster_url?: string;
 };
 
 export default function EventShow({ event, myAttendance }: { event: Event; myAttendance?: MyAttendance | null }) {
@@ -54,8 +55,13 @@ export default function EventShow({ event, myAttendance }: { event: Event; myAtt
         <AppLayout breadcrumbs={[{ title: 'Acara', href: '/acara' } as BreadcrumbItem, { title: event.title, href: '#' }]}>
             <Head title={event.title} />
             <div className="p-6">
-                <Card className="mx-auto max-w-2xl">
-                    <CardHeader>
+                <Card className="mx-auto max-w-2xl overflow-hidden">
+                    {event.poster_url && (
+                        <div className="w-full h-56 md:h-80 bg-slate-100 overflow-hidden border-b border-slate-100">
+                            <img src={event.poster_url} className="w-full h-full object-cover" alt="Poster Acara" />
+                        </div>
+                    )}
+                    <CardHeader className="pt-6">
                         <div className="flex justify-between items-start gap-4">
                             <div>
                                 <CardTitle className="text-xl font-bold">{event.title}</CardTitle>
