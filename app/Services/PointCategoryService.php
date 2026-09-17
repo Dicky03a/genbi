@@ -34,7 +34,7 @@ class PointCategoryService
 
     public function delete(PointCategory $category): void
     {
-        if ($category->pointTransactions()->exists() || $category->pointSubmissions()->exists()) {
+        if ($category->rates()->exists() || $category->pointTransactions()->exists() || $category->pointSubmissions()->exists()) {
             throw new DomainException('Kategori poin yang sudah dirujuk tidak boleh dihapus. Nonaktifkan kategori tersebut.');
         }
 

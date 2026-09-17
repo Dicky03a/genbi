@@ -26,14 +26,26 @@ class DashboardController extends Controller
             $period = Period::query()->active()->latest('starts_on')->first();
             $recap = $period ? $this->recapService->forUser($user, $period) : null;
 
+            $openEvents = Event::query()
+                ->openForAttendance()
+                ->with('komisariat')
+                ->latest('starts_at')
+                ->get();
+
+            $userAttendances = Attendance::where('user_id', $user->id)
+                ->whereIn('event_id', $openEvents->pluck('id'))
+                ->get()
+                ->keyBy('event_id');
+
+            $openEvents->transform(function ($event) use ($userAttendances) {
+                $att = $userAttendances->get($event->id);
+                $event->my_attendance_status = $att ? $att->status : null;
+                return $event;
+            });
+
             return Inertia::render('user/dashboard', [
                 'recap' => $recap,
-                'openEvents' => Event::query()
-                    ->openForAttendance()
-                    ->where(fn($query) => $query->whereNull('komisariat_id')->orWhere('komisariat_id', $user->komisariat_id))
-                    ->with('komisariat')
-                    ->latest('starts_at')
-                    ->get(),
+                'openEvents' => $openEvents,
             ]);
         }
 

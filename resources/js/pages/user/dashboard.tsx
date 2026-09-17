@@ -23,7 +23,7 @@ interface DashboardProps {
         total_points: number;
         progress: { percentage: number; target_points: number; achieved: boolean };
     } | null;
-    openEvents?: { id: number; slug: string; title: string; starts_at: string; komisariat: { name: string } | null }[];
+    openEvents?: { id: number; slug: string; title: string; starts_at: string; komisariat: { name: string } | null; my_attendance_status?: string | null }[];
 }
 
 function InfoRow({ icon, label, value }: InfoRowProps) {
@@ -116,10 +116,26 @@ export default function Dashboard({ recap, openEvents = [] }: DashboardProps) {
                                 <Link
                                     key={event.id}
                                     href={`/acara/${event.slug}`}
-                                    className="hover:bg-muted/30 flex justify-between rounded border p-3 text-sm"
+                                    className="hover:bg-muted/30 flex items-center justify-between rounded border p-3 text-sm transition"
                                 >
-                                    <span>{event.title}</span>
-                                    <span className="text-muted-foreground">{event.komisariat?.name ?? 'Semua komisariat'}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium">{event.title}</span>
+                                        <span className="text-xs text-muted-foreground">• {event.komisariat?.name ?? 'Semua komisariat'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {event.my_attendance_status === 'disetujui' && (
+                                            <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Disetujui</span>
+                                        )}
+                                        {event.my_attendance_status === 'ditolak' && (
+                                            <span className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Ditolak</span>
+                                        )}
+                                        {event.my_attendance_status === 'menunggu' && (
+                                            <span className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Menunggu Verifikasi</span>
+                                        )}
+                                        {!event.my_attendance_status && (
+                                            <span className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full">Belum Absen</span>
+                                        )}
+                                    </div>
                                 </Link>
                             ))}
                         </CardContent>

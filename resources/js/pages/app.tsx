@@ -113,6 +113,7 @@ export default function App({ about, latestNews }: AppPageProps) {
 
                 {/* Latest News Section */}
                 <HomeNewsSection news={latestNews} />
+                
             </main>
 
             <PublicFooter />

@@ -51,7 +51,7 @@ export function AppSidebar() {
                       { title: 'Periode', url: '/admin/periode', icon: CalendarDays },
                       { title: 'Kategori Poin', url: '/admin/kategori-poin', icon: Tags },
                       { title: 'Tarif Poin', url: '/admin/tarif-poin', icon: Percent },
-                      ...(isKorkomOrSuperadmin ? [{ title: 'Komisariat', url: '/admin/komisariat', icon: Users }] : []),
+                      ...(isKorkomOrSuperadmin ? [{ title: 'Kategori Acara', url: '/admin/komisariat', icon: Tags }] : []),
                   ],
               },
               {

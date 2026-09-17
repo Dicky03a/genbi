@@ -10,7 +10,7 @@ class KomisariatService
 {
     public function getAll(): Collection
     {
-        return Komisariat::query()->withCount('users')->latest()->get();
+        return Komisariat::query()->withCount('events')->latest()->get();
     }
 
     public function create(array $data): Komisariat
@@ -27,8 +27,8 @@ class KomisariatService
 
     public function delete(Komisariat $komisariat): void
     {
-        if ($komisariat->users()->exists() || $komisariat->events()->exists()) {
-            throw new DomainException('Komisariat yang sudah dirujuk tidak boleh dihapus. Nonaktifkan komisariat tersebut.');
+        if ($komisariat->events()->exists()) {
+            throw new DomainException('Kategori acara ini sudah digunakan dalam acara dan tidak dapat dihapus. Anda dapat menonaktifkannya.');
         }
 
         $komisariat->delete();

@@ -18,8 +18,20 @@ class SubmissionVerificationController extends Controller
 
     public function index(): Response
     {
+        $user = request()->user();
+
+        $historyQuery = PointSubmission::query()
+            ->whereIn('status', ['disetujui', 'ditolak'])
+            ->with(['user', 'pointCategory', 'period', 'division', 'verifier'])
+            ->latest('verified_at');
+
+        if ($user->hasRole('admin_komisariat')) {
+            $historyQuery->whereHas('user', fn ($q) => $q->where('komisariat_id', $user->komisariat_id));
+        }
+
         return Inertia::render('admin/submissions/verify', [
-            'submissions' => $this->service->getPending(request()->user()),
+            'submissions' => $this->service->getPending($user),
+            'history'     => $historyQuery->paginate(15)->withQueryString(),
         ]);
     }
 

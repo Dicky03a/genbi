@@ -86,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('acara/{event}', [EventController::class, 'update'])->name('events.update');
         Route::post('acara/{event}/status', [EventController::class, 'status'])->name('events.status');
         Route::get('absensi', [AttendanceVerificationController::class, 'index'])->name('attendances.index');
+        Route::get('absensi/{attendance}/foto', [AttendanceVerificationController::class, 'photo'])->name('attendances.photo');
         Route::patch('absensi/{attendance}/verifikasi', [AttendanceVerificationController::class, 'verify'])->name('attendances.verify');
         Route::patch('absensi/{attendance}/tolak', [AttendanceVerificationController::class, 'reject'])->name('attendances.reject');
         Route::get('pengajuan', [SubmissionVerificationController::class, 'index'])->name('submissions.index');

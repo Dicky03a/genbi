@@ -18,13 +18,22 @@ class AttendanceVerificationController extends Controller
 
     public function index(): Response
     {
-        $query = Attendance::query()->pending()->with(['user', 'event', 'eventRole'])->latest();
-        if (request()->user()->hasRole('admin_komisariat')) {
-            $query->whereHas('event', fn ($eventQuery) => $eventQuery->where('komisariat_id', request()->user()->komisariat_id));
+        $user = request()->user();
+
+        $pendingQuery = Attendance::query()->pending()->with(['user', 'event', 'eventRole'])->latest();
+        $historyQuery = Attendance::query()
+            ->whereIn('status', ['disetujui', 'ditolak'])
+            ->with(['user', 'event', 'eventRole', 'verifier'])
+            ->latest('verified_at');
+
+        if ($user->hasRole('admin_komisariat')) {
+            $pendingQuery->whereHas('event', fn ($q) => $q->where('komisariat_id', $user->komisariat_id));
+            $historyQuery->whereHas('event', fn ($q) => $q->where('komisariat_id', $user->komisariat_id));
         }
 
         return Inertia::render('admin/attendances/verify', [
-            'attendances' => $query->get(),
+            'attendances' => $pendingQuery->get(),
+            'history'     => $historyQuery->paginate(15)->withQueryString(),
         ]);
     }
 
@@ -53,5 +62,26 @@ class AttendanceVerificationController extends Controller
         }
 
         return back()->with('success', 'Absensi berhasil ditolak.');
+    }
+
+    public function photo(Attendance $attendance): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        \Illuminate\Support\Facades\Gate::authorize('verify', $attendance);
+
+        $disk = config('attendance.photo_disk', 'public');
+
+        if (\Illuminate\Support\Facades\Storage::disk($disk)->exists($attendance->photo_path)) {
+            return \Illuminate\Support\Facades\Storage::disk($disk)->response($attendance->photo_path);
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($attendance->photo_path)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->response($attendance->photo_path);
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('local')->exists($attendance->photo_path)) {
+            return \Illuminate\Support\Facades\Storage::disk('local')->response($attendance->photo_path);
+        }
+
+        abort(404, 'Foto absensi tidak ditemukan.');
     }
 }

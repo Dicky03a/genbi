@@ -8,15 +8,34 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import InputError from '@/components/input-error';
 import { type BreadcrumbItem } from '@/types';
+import { Calendar, Plus, Trash2, ArrowLeft, Save, Award } from 'lucide-react';
 
 type Komisariat = { id: number; name: string };
 type EventRole = { name: string; points: number };
-type ExistingEvent = { id: number; title: string; description: string | null; komisariat_id: number | null; starts_at: string; ends_at: string; opens_at: string; closes_at: string; latitude: string; longitude: string; radius_m: number; max_gps_accuracy_m: number | null; roles: EventRole[] };
-type EventForm = { komisariat_id: string; title: string; description: string; starts_at: string; ends_at: string; opens_at: string; closes_at: string; latitude: string; longitude: string; radius_m: number; max_gps_accuracy_m: number | ''; roles: EventRole[] };
+type ExistingEvent = {
+    id: number;
+    title: string;
+    description: string | null;
+    komisariat_id: number | null;
+    starts_at: string;
+    ends_at: string;
+    opens_at: string;
+    closes_at: string;
+    roles: EventRole[];
+};
+type EventForm = {
+    komisariat_id: string;
+    title: string;
+    description: string;
+    starts_at: string;
+    ends_at: string;
+    opens_at: string;
+    closes_at: string;
+    roles: EventRole[];
+};
 
 const emptyRole = (): EventRole => ({ name: '', points: 0 });
-
-const localDateTime = (value?: string): string => value ? value.slice(0, 16).replace(' ', 'T') : '';
+const localDateTime = (value?: string): string => (value ? value.slice(0, 16).replace(' ', 'T') : '');
 
 export default function EventForm({ event, komisariats }: { event?: ExistingEvent; komisariats: Komisariat[] }) {
     const editing = Boolean(event);
@@ -28,17 +47,18 @@ export default function EventForm({ event, komisariats }: { event?: ExistingEven
         ends_at: localDateTime(event?.ends_at),
         opens_at: localDateTime(event?.opens_at),
         closes_at: localDateTime(event?.closes_at),
-        latitude: event?.latitude ?? '',
-        longitude: event?.longitude ?? '',
-        radius_m: event?.radius_m ?? 100,
-        max_gps_accuracy_m: event?.max_gps_accuracy_m ?? '',
         roles: event?.roles ?? [emptyRole()],
     });
     const [roleError, setRoleError] = useState('');
-    const breadcrumbs: BreadcrumbItem[] = [{ title: 'Acara', href: '/admin/acara' }, { title: editing ? 'Edit' : 'Buat', href: '#' }];
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Acara', href: '/admin/acara' },
+        { title: editing ? 'Edit Acara' : 'Buat Acara', href: '#' },
+    ];
 
     const updateRole = (index: number, field: keyof EventRole, value: string) => {
-        const roles = data.roles.map((role, roleIndex) => roleIndex === index ? { ...role, [field]: field === 'points' ? Number(value) : value } : role);
+        const roles = data.roles.map((role, roleIndex) =>
+            roleIndex === index ? { ...role, [field]: field === 'points' ? Number(value) : value } : role
+        );
         setData('roles', roles);
     };
 
@@ -53,24 +73,189 @@ export default function EventForm({ event, komisariats }: { event?: ExistingEven
         editing ? put(route('admin.events.update', event?.id), options) : post(route('admin.events.store'), options);
     };
 
-    return <AppLayout breadcrumbs={breadcrumbs}>
-        <Head title={editing ? 'Edit acara' : 'Buat acara'} />
-        <div className="p-6"><form onSubmit={submit} className="mx-auto max-w-4xl space-y-6">
-            <Card><CardHeader><CardTitle>{editing ? 'Edit acara' : 'Buat acara'}</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2"><Label htmlFor="title">Nama acara</Label><Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} /><InputError message={errors.title} /></div>
-                <div className="md:col-span-2"><Label htmlFor="description">Deskripsi</Label><Textarea id="description" value={data.description} onChange={(e) => setData('description', e.target.value)} /><InputError message={errors.description} /></div>
-                <div><Label htmlFor="komisariat_id">Komisariat</Label><select id="komisariat_id" className="border-input bg-background flex h-9 w-full rounded-md border px-3 text-sm" value={data.komisariat_id} onChange={(e) => setData('komisariat_id', e.target.value)}><option value="">Semua komisariat</option>{komisariats.map((komisariat) => <option key={komisariat.id} value={komisariat.id}>{komisariat.name}</option>)}</select><InputError message={errors.komisariat_id} /></div>
-                <div><Label htmlFor="radius_m">Radius lokasi (meter)</Label><Input id="radius_m" type="number" min="1" value={data.radius_m} onChange={(e) => setData('radius_m', Number(e.target.value))} /><InputError message={errors.radius_m} /></div>
-                <div><Label htmlFor="latitude">Latitude</Label><Input id="latitude" value={data.latitude} onChange={(e) => setData('latitude', e.target.value)} /><InputError message={errors.latitude} /></div>
-                <div><Label htmlFor="longitude">Longitude</Label><Input id="longitude" value={data.longitude} onChange={(e) => setData('longitude', e.target.value)} /><InputError message={errors.longitude} /></div>
-                <div><Label htmlFor="max_gps_accuracy_m">Akurasi GPS maksimum (meter)</Label><Input id="max_gps_accuracy_m" type="number" min="1" value={data.max_gps_accuracy_m} onChange={(e) => setData('max_gps_accuracy_m', e.target.value ? Number(e.target.value) : '')} /><InputError message={errors.max_gps_accuracy_m} /></div>
-                <div><Label htmlFor="starts_at">Acara mulai</Label><Input id="starts_at" type="datetime-local" value={data.starts_at} onChange={(e) => setData('starts_at', e.target.value)} /><InputError message={errors.starts_at} /></div>
-                <div><Label htmlFor="ends_at">Acara selesai</Label><Input id="ends_at" type="datetime-local" value={data.ends_at} onChange={(e) => setData('ends_at', e.target.value)} /><InputError message={errors.ends_at} /></div>
-                <div><Label htmlFor="opens_at">Absensi dibuka</Label><Input id="opens_at" type="datetime-local" value={data.opens_at} onChange={(e) => setData('opens_at', e.target.value)} /><InputError message={errors.opens_at} /></div>
-                <div><Label htmlFor="closes_at">Absensi ditutup</Label><Input id="closes_at" type="datetime-local" value={data.closes_at} onChange={(e) => setData('closes_at', e.target.value)} /><InputError message={errors.closes_at} /></div>
-            </CardContent></Card>
-            <Card><CardHeader><CardTitle>Peran dan poin</CardTitle></CardHeader><CardContent className="space-y-3">{data.roles.map((role, index) => <div key={index} className="flex gap-3"><Input aria-label={`Nama peran ${index + 1}`} placeholder="Nama peran" value={role.name} onChange={(e) => updateRole(index, 'name', e.target.value)} /><Input aria-label={`Poin peran ${index + 1}`} type="number" min="0" placeholder="Poin" value={role.points} onChange={(e) => updateRole(index, 'points', e.target.value)} /><Button type="button" variant="outline" onClick={() => setData('roles', data.roles.filter((_, roleIndex) => roleIndex !== index))}>Hapus</Button></div>)}<InputError message={roleError || errors.roles} /><Button type="button" variant="outline" onClick={() => setData('roles', [...data.roles, emptyRole()])}>Tambah peran</Button></CardContent></Card>
-            <div className="flex gap-3"><Button type="submit" disabled={processing}>{editing ? 'Simpan perubahan' : 'Simpan acara'}</Button><Button type="button" variant="outline" asChild><Link href={route('admin.events.index')}>Batal</Link></Button></div>
-        </form></div>
-    </AppLayout>;
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={editing ? 'Edit Acara' : 'Buat Acara Baru'} />
+            <div className="p-6 max-w-4xl mx-auto space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            <Calendar className="h-6 w-6 text-indigo-600" />
+                            {editing ? 'Edit Informasi Acara' : 'Form Buat Acara Baru'}
+                        </h1>
+                        <p className="text-sm text-slate-500 mt-1">
+                            Lengkapi detail acara, kategori komisariat, dan peran poin peserta.
+                        </p>
+                    </div>
+                    <Button variant="outline" asChild className="border-slate-300 text-slate-700">
+                        <Link href={route('admin.events.index')}>
+                            <ArrowLeft className="w-4 h-4 mr-1.5" /> Kembali
+                        </Link>
+                    </Button>
+                </div>
+
+                <form onSubmit={submit} className="space-y-6">
+                    <Card className="border border-slate-200 bg-white shadow-sm">
+                        <CardHeader className="bg-slate-50/60 border-b border-slate-100 pb-3">
+                            <CardTitle className="text-base font-bold text-slate-900">Informasi Utama Acara</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-5 grid gap-4 md:grid-cols-2">
+                            <div className="md:col-span-2">
+                                <Label htmlFor="title" className="text-xs font-semibold text-slate-700">Nama Acara <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="title"
+                                    placeholder="Masukkan judul / nama acara"
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1 focus:ring-2 focus:ring-indigo-500/20"
+                                />
+                                <InputError message={errors.title} />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <Label htmlFor="description" className="text-xs font-semibold text-slate-700">Deskripsi Acara</Label>
+                                <Textarea
+                                    id="description"
+                                    placeholder="Jelaskan secara singkat agenda & deskripsi acara..."
+                                    value={data.description}
+                                    onChange={(e) => setData('description', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1 min-h-[90px] focus:ring-2 focus:ring-indigo-500/20"
+                                />
+                                <InputError message={errors.description} />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <Label htmlFor="komisariat_id" className="text-xs font-semibold text-slate-700">Kategori Komisariat Acara</Label>
+                                <select
+                                    id="komisariat_id"
+                                    className="border-slate-300 bg-white text-slate-900 flex h-10 w-full rounded-md border px-3 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                    value={data.komisariat_id}
+                                    onChange={(e) => setData('komisariat_id', e.target.value)}
+                                >
+                                    <option value="" className="text-slate-900 font-medium">Semua Komisariat (Acara Umum)</option>
+                                    {komisariats.map((komisariat) => (
+                                        <option key={komisariat.id} value={komisariat.id} className="text-slate-900">
+                                            {komisariat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.komisariat_id} />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="starts_at" className="text-xs font-semibold text-slate-700">Waktu Acara Mulai <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="starts_at"
+                                    type="datetime-local"
+                                    value={data.starts_at}
+                                    onChange={(e) => setData('starts_at', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1"
+                                />
+                                <InputError message={errors.starts_at} />
+                            </div>
+                            <div>
+                                <Label htmlFor="ends_at" className="text-xs font-semibold text-slate-700">Waktu Acara Selesai <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="ends_at"
+                                    type="datetime-local"
+                                    value={data.ends_at}
+                                    onChange={(e) => setData('ends_at', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1"
+                                />
+                                <InputError message={errors.ends_at} />
+                            </div>
+                            <div>
+                                <Label htmlFor="opens_at" className="text-xs font-semibold text-slate-700">Jendela Absensi Dibuka <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="opens_at"
+                                    type="datetime-local"
+                                    value={data.opens_at}
+                                    onChange={(e) => setData('opens_at', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1"
+                                />
+                                <InputError message={errors.opens_at} />
+                            </div>
+                            <div>
+                                <Label htmlFor="closes_at" className="text-xs font-semibold text-slate-700">Jendela Absensi Ditutup <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="closes_at"
+                                    type="datetime-local"
+                                    value={data.closes_at}
+                                    onChange={(e) => setData('closes_at', e.target.value)}
+                                    className="text-slate-900 border-slate-300 mt-1"
+                                />
+                                <InputError message={errors.closes_at} />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border border-slate-200 bg-white shadow-sm">
+                        <CardHeader className="bg-slate-50/60 border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
+                            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <Award className="h-4 w-4 text-amber-500" />
+                                Peran Kehadiran & Perolehan Poin
+                            </CardTitle>
+                            <span className="text-xs text-slate-500">Definisikan poin untuk setiap peran</span>
+                        </CardHeader>
+                        <CardContent className="pt-5 space-y-4">
+                            {data.roles.map((role, index) => (
+                                <div key={index} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+                                    <div className="flex-1 w-full">
+                                        <Input
+                                            aria-label={`Nama peran ${index + 1}`}
+                                            placeholder="Contoh: Panitia / Peserta / Pemateri"
+                                            value={role.name}
+                                            onChange={(e) => updateRole(index, 'name', e.target.value)}
+                                            className="text-slate-900 bg-white border-slate-300"
+                                        />
+                                    </div>
+                                    <div className="w-full sm:w-36">
+                                        <Input
+                                            aria-label={`Poin peran ${index + 1}`}
+                                            type="number"
+                                            min="0"
+                                            placeholder="Jumlah poin"
+                                            value={role.points}
+                                            onChange={(e) => updateRole(index, 'points', e.target.value)}
+                                            className="text-slate-900 bg-white border-slate-300"
+                                        />
+                                    </div>
+                                    {data.roles.length > 1 && (
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => setData('roles', data.roles.filter((_, roleIndex) => roleIndex !== index))}
+                                            className="bg-rose-600 hover:bg-rose-700 text-white"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
+                            <InputError message={roleError || errors.roles} />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setData('roles', [...data.roles, emptyRole()])}
+                                className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 font-medium"
+                            >
+                                <Plus className="w-4 h-4 mr-1.5" /> Tambah Peran Kehadiran
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex items-center gap-3 pt-2">
+                        <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm">
+                            <Save className="w-4 h-4 mr-1.5" />
+                            {editing ? 'Simpan Perubahan Acara' : 'Simpan & Publikasikan Acara'}
+                        </Button>
+                        <Button type="button" variant="outline" asChild className="border-slate-300 text-slate-700">
+                            <Link href={route('admin.events.index')}>Batal</Link>
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </AppLayout>
+    );
 }

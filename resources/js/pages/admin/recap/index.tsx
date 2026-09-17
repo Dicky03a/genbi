@@ -58,20 +58,6 @@ export default function RecapIndex({
                             className="border-input bg-background h-9 rounded-md border px-3 text-sm"
                             defaultValue=""
                             onChange={(e) =>
-                                (window.location.href = `${route('admin.recap.index')}?period_id=${selectedPeriod?.id ?? ''}&komisariat_id=${e.target.value}`)
-                            }
-                        >
-                            <option value="">Semua komisariat</option>
-                            {komisariats.map((komisariat) => (
-                                <option key={komisariat.id} value={komisariat.id}>
-                                    {komisariat.name}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-                            defaultValue=""
-                            onChange={(e) =>
                                 (window.location.href = `${route('admin.recap.index')}?period_id=${selectedPeriod?.id ?? ''}&division_id=${e.target.value}`)
                             }
                         >

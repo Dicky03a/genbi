@@ -36,16 +36,30 @@ class AttendanceController extends Controller
             'message' => 'Absensi terkirim, menunggu verifikasi.',
             'data' => [
                 'id' => $attendance->id,
-                'distance_m' => (float) $attendance->distance_m,
                 'status' => $attendance->status,
             ],
         ], 201);
     }
 
-    public function create(Event $event): Response
+    public function create(\Illuminate\Http\Request $request, Event $event): Response
     {
+        $myAttendance = \App\Models\Attendance::with('eventRole')
+            ->where('event_id', $event->id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
         return Inertia::render('attendance/submit', [
             'event' => $event->load('roles'),
+            'myAttendance' => $myAttendance ? [
+                'id' => $myAttendance->id,
+                'status' => $myAttendance->status,
+                'event_role' => $myAttendance->eventRole ? [
+                    'name' => $myAttendance->eventRole->name,
+                    'points' => $myAttendance->eventRole->points,
+                ] : null,
+                'created_at' => $myAttendance->created_at->format('d M Y H:i'),
+                'photo_path' => $myAttendance->photo_path,
+            ] : null,
         ]);
     }
 }

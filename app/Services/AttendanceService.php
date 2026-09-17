@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 class AttendanceService
 {
     public function __construct(
-        private readonly GeoService $geoService,
         private readonly PhotoStorageService $photoStorage,
         private readonly PointLedgerService $ledger,
         private readonly VerificationStateService $verificationState,
@@ -36,36 +35,12 @@ class AttendanceService
             throw new DomainException('Absensi sudah ditutup.');
         }
 
-        if ($event->komisariat_id !== null && $user->komisariat_id !== $event->komisariat_id) {
-            throw new DomainException('Acara ini khusus untuk komisariat lain.');
-        }
-
         if (! EventRole::query()->whereKey($data['event_role_id'])->where('event_id', $event->id)->exists()) {
             throw new DomainException('Peran acara tidak valid.');
         }
 
         if (! $photo->isValid() || ! str_starts_with((string) $photo->getMimeType(), 'image/')) {
             throw new DomainException('Foto tidak valid.');
-        }
-
-        $accuracyLimit = $event->max_gps_accuracy_m ?? config('attendance.max_gps_accuracy_m');
-        if ((float) $data['gps_accuracy_m'] > (float) $accuracyLimit) {
-            throw new DomainException('Sinyal GPS kurang akurat, coba di area terbuka.');
-        }
-
-        $distance = $this->geoService->haversine(
-            (float) $data['captured_lat'],
-            (float) $data['captured_lng'],
-            (float) $event->latitude,
-            (float) $event->longitude,
-        );
-        $allowedDistance = $event->radius_m + (float) config('attendance.location_tolerance_m');
-        if ($distance > $allowedDistance) {
-            throw new DomainException(sprintf(
-                'Anda berada di luar lokasi acara. Jarak Anda %.0f m, batas %.0f m.',
-                $distance,
-                $allowedDistance,
-            ));
         }
 
         if (Attendance::query()->where('event_id', $event->id)->where('user_id', $user->id)->exists()) {
@@ -75,15 +50,15 @@ class AttendanceService
         $photoPath = $this->photoStorage->store($photo);
 
         try {
-            return DB::transaction(function () use ($user, $event, $data, $distance, $photoPath): Attendance {
+            return DB::transaction(function () use ($user, $event, $data, $photoPath): Attendance {
                 $attendance = Attendance::create([
                     'event_id' => $event->id,
                     'user_id' => $user->id,
                     'event_role_id' => $data['event_role_id'] ?? null,
-                    'captured_lat' => $data['captured_lat'],
-                    'captured_lng' => $data['captured_lng'],
-                    'gps_accuracy_m' => $data['gps_accuracy_m'],
-                    'distance_m' => $distance,
+                    'captured_lat' => null,
+                    'captured_lng' => null,
+                    'gps_accuracy_m' => null,
+                    'distance_m' => null,
                     'photo_path' => $photoPath,
                     'status' => 'menunggu',
                 ]);

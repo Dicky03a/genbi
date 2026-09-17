@@ -3,10 +3,12 @@
 use App\Models\Komisariat;
 use App\Models\Period;
 use App\Models\PointCategory;
+use App\Models\PointRate;
 use App\Models\PointTransaction;
 use App\Models\User;
 use App\Services\KomisariatService;
 use App\Services\PeriodService;
+use Spatie\Permission\Models\Role;
 
 it('rejects overlapping periods', function () {
     $service = app(PeriodService::class);
@@ -76,4 +78,51 @@ it('rejects deleting a period referenced by a transaction', function () {
 
     expect(fn () => app(PeriodService::class)->delete($period))
         ->toThrow(DomainException::class, 'Periode yang sudah dirujuk');
+});
+
+it('rejects deleting a point category that still has rates', function () {
+    $category = PointCategory::create(['name' => 'Kepemimpinan', 'slug' => 'kepemimpinan']);
+    PointRate::create([
+        'point_category_id' => $category->id,
+        'name' => 'Ketua panitia',
+        'points' => 10,
+    ]);
+
+    expect(fn () => app(\App\Services\PointCategoryService::class)->delete($category))
+        ->toThrow(DomainException::class, 'Kategori poin yang sudah dirujuk');
+});
+
+it('can create, update, and delete a point rate', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::findOrCreate('superadmin', 'web'));
+    $category = PointCategory::create(['name' => 'Kepemimpinan', 'slug' => 'kepemimpinan']);
+
+    $this->actingAs($admin)
+        ->post(route('admin.point-rates.store'), [
+            'point_category_id' => $category->id,
+            'name' => 'Ketua panitia',
+            'points' => 10,
+            'is_active' => true,
+        ])
+        ->assertRedirect();
+
+    $rate = PointRate::query()->firstOrFail();
+    $this->assertDatabaseHas('point_rates', ['id' => $rate->id, 'name' => 'Ketua panitia', 'points' => 10]);
+
+    $this->actingAs($admin)
+        ->put(route('admin.point-rates.update', $rate), [
+            'point_category_id' => $category->id,
+            'name' => 'Koordinator acara',
+            'points' => 15,
+            'is_active' => false,
+        ])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('point_rates', ['id' => $rate->id, 'name' => 'Koordinator acara', 'points' => 15, 'is_active' => false]);
+
+    $this->actingAs($admin)
+        ->delete(route('admin.point-rates.destroy', $rate))
+        ->assertRedirect();
+
+    $this->assertDatabaseMissing('point_rates', ['id' => $rate->id]);
 });

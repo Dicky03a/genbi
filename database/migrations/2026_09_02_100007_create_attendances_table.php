@@ -13,10 +13,10 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('event_role_id')->nullable()->constrained()->nullOnDelete();
-            $table->decimal('captured_lat', 10, 7);
-            $table->decimal('captured_lng', 10, 7);
-            $table->decimal('gps_accuracy_m', 8, 2);
-            $table->decimal('distance_m', 10, 2);
+            $table->decimal('captured_lat', 10, 7)->nullable();
+            $table->decimal('captured_lng', 10, 7)->nullable();
+            $table->decimal('gps_accuracy_m', 8, 2)->nullable();
+            $table->decimal('distance_m', 10, 2)->nullable();
             $table->string('photo_path');
             $table->string('status')->default('menunggu');
             $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();

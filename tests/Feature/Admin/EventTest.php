@@ -19,7 +19,6 @@ function eventPeriod(): Period
         'target_points' => 100,
     ]);
 }
-
 function eventPayload(int $komisariatId): array
 {
     return [
@@ -30,10 +29,6 @@ function eventPayload(int $komisariatId): array
         'ends_at' => '2026-09-10 12:00:00',
         'opens_at' => '2026-09-10 08:30:00',
         'closes_at' => '2026-09-10 12:30:00',
-        'latitude' => -7.1500000,
-        'longitude' => 111.8800000,
-        'radius_m' => 100,
-        'max_gps_accuracy_m' => 50,
     ];
 }
 

@@ -33,21 +33,14 @@ function attendanceEvent(User $creator, ?int $komisariatId = null, string $statu
         'ends_at' => '2026-09-10 12:00:00',
         'opens_at' => '2026-09-10 08:30:00',
         'closes_at' => '2026-09-10 12:30:00',
-        'latitude' => -7.1500000,
-        'longitude' => 111.8800000,
-        'radius_m' => 100,
-        'max_gps_accuracy_m' => 50,
         'status' => $status,
     ]);
 }
 
-function attendanceData(int $roleId, float $accuracy = 10): array
+function attendanceData(int $roleId): array
 {
     return [
         'event_role_id' => $roleId,
-        'captured_lat' => -7.1500000,
-        'captured_lng' => 111.8800000,
-        'gps_accuracy_m' => $accuracy,
     ];
 }
 
@@ -69,15 +62,6 @@ it('rejects attendance when the event is not open', function () {
         ->toThrow(DomainException::class, 'belum dibuka');
 });
 
-it('rejects inaccurate gps before checking the location', function () {
-    $user = User::factory()->create();
-    $event = attendanceEvent($user);
-    $role = EventRole::create(['event_id' => $event->id, 'name' => 'Peserta', 'points' => 5]);
-
-    expect(fn () => app(AttendanceService::class)->submit($user, $event, attendanceData($role->id, 100), UploadedFile::fake()->image('photo.jpg')))
-        ->toThrow(DomainException::class, 'Sinyal GPS');
-});
-
 it('rejects attendance outside the opening window', function () {
     Carbon::setTestNow('2026-09-10 13:00:00');
     $user = User::factory()->create();
@@ -88,7 +72,7 @@ it('rejects attendance outside the opening window', function () {
         ->toThrow(DomainException::class, 'Absensi sudah ditutup');
 });
 
-it('rejects attendance from another komisariat', function () {
+it('allows attendance regardless of user komisariat', function () {
     $eventKomisariat = Komisariat::create(['name' => 'Utara', 'code' => 'UTARA']);
     $userKomisariat = Komisariat::create(['name' => 'Selatan', 'code' => 'SELATAN']);
     $creator = User::factory()->create(['komisariat_id' => $eventKomisariat->id]);
@@ -96,18 +80,9 @@ it('rejects attendance from another komisariat', function () {
     $event = attendanceEvent($creator, $eventKomisariat->id);
     $role = EventRole::create(['event_id' => $event->id, 'name' => 'Peserta', 'points' => 5]);
 
-    expect(fn () => app(AttendanceService::class)->submit($user, $event, attendanceData($role->id), UploadedFile::fake()->image('photo.jpg')))
-        ->toThrow(DomainException::class, 'komisariat lain');
-});
+    $attendance = app(AttendanceService::class)->submit($user, $event, attendanceData($role->id), UploadedFile::fake()->image('photo.jpg'));
 
-it('rejects attendance outside the event radius', function () {
-    $user = User::factory()->create();
-    $event = attendanceEvent($user);
-    $role = EventRole::create(['event_id' => $event->id, 'name' => 'Peserta', 'points' => 5]);
-    $data = [...attendanceData($role->id), 'captured_lat' => -7.1600000];
-
-    expect(fn () => app(AttendanceService::class)->submit($user, $event, $data, UploadedFile::fake()->image('photo.jpg')))
-        ->toThrow(DomainException::class, 'di luar lokasi');
+    expect($attendance->status)->toBe('menunggu');
 });
 
 it('rejects an event role belonging to another event', function () {
@@ -120,7 +95,7 @@ it('rejects an event role belonging to another event', function () {
         ->toThrow(DomainException::class, 'Peran acara tidak valid');
 });
 
-it('submits attendance, computes distance on the server, and writes an audit log', function () {
+it('submits selfie attendance without location requirements and writes an audit log', function () {
     $user = User::factory()->create();
     $event = attendanceEvent($user);
     $role = EventRole::create(['event_id' => $event->id, 'name' => 'Peserta', 'points' => 5]);
@@ -128,7 +103,8 @@ it('submits attendance, computes distance on the server, and writes an audit log
     $attendance = app(AttendanceService::class)->submit($user, $event, attendanceData($role->id), UploadedFile::fake()->image('photo.jpg'));
 
     expect($attendance->status)->toBe('menunggu')
-        ->and((float) $attendance->distance_m)->toBe(0.0)
+        ->and($attendance->captured_lat)->toBeNull()
+        ->and($attendance->captured_lng)->toBeNull()
         ->and($attendance->verificationLogs)->toHaveCount(1)
         ->and(Storage::disk('local')->exists($attendance->photo_path))->toBeTrue();
 });

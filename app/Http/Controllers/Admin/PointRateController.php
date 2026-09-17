@@ -20,7 +20,7 @@ class PointRateController extends Controller
     {
         return Inertia::render('admin/master/point-rates/index', [
             'rates' => $this->service->getAll(),
-            'categories' => PointCategory::query()->active()->orderBy('name')->get(['id', 'name']),
+            'categories' => PointCategory::query()->orderBy('name')->get(['id', 'name', 'is_active']),
         ]);
     }
 

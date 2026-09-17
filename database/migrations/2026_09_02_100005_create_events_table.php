@@ -20,9 +20,9 @@ return new class extends Migration
             $table->dateTime('ends_at');
             $table->dateTime('opens_at');
             $table->dateTime('closes_at');
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
-            $table->unsignedInteger('radius_m')->default(100);
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->unsignedInteger('radius_m')->nullable();
             $table->unsignedInteger('max_gps_accuracy_m')->nullable();
             $table->string('status')->default('draft');
             $table->timestamps();
