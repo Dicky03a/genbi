@@ -26,8 +26,6 @@ class AttendanceSeeder extends Seeder
                         'description' => 'Kegiatan contoh untuk verifikasi absensi.',
                         'starts_at' => '2026-09-10 09:00:00',
                         'ends_at' => '2026-09-10 12:00:00',
-                        'opens_at' => '2026-09-10 08:30:00',
-                        'closes_at' => '2026-09-10 12:30:00',
                         'latitude' => -7.1500000,
                         'longitude' => 111.8800000,
                         'radius_m' => 100,

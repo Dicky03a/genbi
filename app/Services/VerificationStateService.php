@@ -10,8 +10,9 @@ class VerificationStateService
      * Allowed status transitions for all verification flows.
      */
     private const ALLOWED = [
-        'menunggu' => ['disetujui', 'ditolak'],
+        'menunggu' => ['disetujui', 'ditolak', 'revisi'],
         'ditolak' => ['menunggu'],
+        'revisi' => ['menunggu'],
         'disetujui' => [],
     ];
 

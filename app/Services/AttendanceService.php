@@ -138,6 +138,81 @@ class AttendanceService
         });
     }
 
+    public function requestRevision(Attendance $attendance, User $actor, string $reason): Attendance
+    {
+        $this->verificationState->assertCanTransition($attendance->status, 'revisi');
+        if (trim($reason) === '') {
+            throw new DomainException('Alasan permintaan revisi wajib diisi.');
+        }
+
+        return DB::transaction(function () use ($attendance, $actor, $reason): Attendance {
+            $attendance->rejection_reason = $reason;
+            $this->changeStatus($attendance, 'revisi', $actor, $reason);
+
+            return $attendance->refresh();
+        });
+    }
+
+    public function revise(Attendance $attendance, User $user, array $data, UploadedFile $photo): Attendance
+    {
+        if ($attendance->user_id !== $user->id) {
+            throw new DomainException('Anda tidak dapat merevisi absensi milik orang lain.');
+        }
+        if ($attendance->status !== 'ditolak' && $attendance->status !== 'revisi') {
+            throw new DomainException('Hanya absensi yang ditolak atau diminta revisi yang dapat dikirim ulang.');
+        }
+
+        $this->verificationState->assertCanTransition($attendance->status, 'menunggu');
+
+        $event = $attendance->event;
+        if ($event->point_type === 'point_rate') {
+            if (! $event->pointRates()->whereKey($data['point_rate_id'] ?? null)->exists()) {
+                throw new DomainException('Tarif poin tidak valid untuk acara ini.');
+            }
+        } else {
+            if (! EventRole::query()->whereKey($data['event_role_id'] ?? null)->where('event_id', $event->id)->exists()) {
+                throw new DomainException('Peran acara tidak valid.');
+            }
+        }
+
+        if (! $photo->isValid() || ! str_starts_with((string) $photo->getMimeType(), 'image/')) {
+            throw new DomainException('Foto tidak valid.');
+        }
+
+        $photoPath = $this->photoStorage->store($photo);
+        $oldPhotoPath = $attendance->photo_path;
+
+        return DB::transaction(function () use ($attendance, $data, $photoPath, $oldPhotoPath, $user): Attendance {
+            $fromStatus = $attendance->status;
+
+            $attendance->update([
+                'event_role_id' => $data['event_role_id'] ?? null,
+                'point_rate_id' => $data['point_rate_id'] ?? null,
+                'photo_path' => $photoPath,
+                'status' => 'menunggu',
+                'rejection_reason' => null,
+                'verified_by' => null,
+                'verified_at' => null,
+            ]);
+
+            if ($oldPhotoPath) {
+                // Ignore failure if previous photo is missing
+                try {
+                    $this->photoStorage->delete($oldPhotoPath);
+                } catch (\Exception $e) {}
+            }
+
+            $attendance->verificationLogs()->create([
+                'actor_id' => $user->id,
+                'from_status' => $fromStatus,
+                'to_status' => 'menunggu',
+                'reason' => 'Absensi direvisi.',
+            ]);
+
+            return $attendance->refresh()->load(['event', 'eventRole']);
+        });
+    }
+
     private function changeStatus(Attendance $attendance, string $status, User $actor, ?string $reason = null): void
     {
         $fromStatus = $attendance->status;

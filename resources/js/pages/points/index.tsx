@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Trophy } from 'lucide-react';
 
 type Transaction = {
     id: number;
@@ -18,7 +20,15 @@ export default function PointsIndex({ transactions }: { transactions: Transactio
         <AppLayout breadcrumbs={[{ title: 'Riwayat poin', href: '/poin' } as BreadcrumbItem]}>
             <Head title="Riwayat poin" />
             <div className="space-y-6 p-6">
-                <h1 className="text-2xl font-semibold">Riwayat poin</h1>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <h1 className="text-2xl font-semibold">Riwayat poin</h1>
+                    <Button asChild variant="outline">
+                        <Link href="/poin/rekap">
+                            <Trophy className="mr-2 h-4 w-4" />
+                            Lihat Rekap Peringkat
+                        </Link>
+                    </Button>
+                </div>
                 <Card>
                     <CardHeader>
                         <CardTitle>Transaksi efektif</CardTitle>

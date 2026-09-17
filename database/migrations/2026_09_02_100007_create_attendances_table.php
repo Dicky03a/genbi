@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('event_role_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('point_rate_id')->nullable()->constrained('point_rates')->nullOnDelete();
             $table->decimal('captured_lat', 10, 7)->nullable();
             $table->decimal('captured_lng', 10, 7)->nullable();
             $table->decimal('gps_accuracy_m', 8, 2)->nullable();

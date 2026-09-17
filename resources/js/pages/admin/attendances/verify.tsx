@@ -16,6 +16,7 @@ import {
     ChevronRight,
     CheckCheck,
     Ban,
+    RefreshCcw,
 } from 'lucide-react';
 
 type Attendance = {
@@ -28,7 +29,7 @@ type Attendance = {
 
 type HistoryItem = {
     id: number;
-    status: 'disetujui' | 'ditolak';
+    status: 'disetujui' | 'ditolak' | 'revisi';
     created_at: string;
     verified_at: string | null;
     rejection_reason: string | null;
@@ -59,6 +60,11 @@ export default function AttendanceVerify({
     const reject = (id: number) => {
         const reason = window.prompt('Alasan penolakan absensi:');
         if (reason) router.patch(route('admin.attendances.reject', id), { reason });
+    };
+
+    const requestRevision = (id: number) => {
+        const reason = window.prompt('Alasan pengembalian untuk revisi absensi:');
+        if (reason) router.patch(route('admin.attendances.request_revision', id), { reason });
     };
 
     const formatDate = (dateStr: string | null) => {
@@ -160,19 +166,27 @@ export default function AttendanceVerify({
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 pt-1">
+                                    <div className="grid grid-cols-3 gap-2 pt-1">
                                         <Button
                                             size="sm"
                                             onClick={() => verify(attendance.id)}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all"
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all px-2"
                                         >
                                             <CheckCircle2 className="w-4 h-4 mr-1.5" /> Setujui
                                         </Button>
                                         <Button
                                             size="sm"
                                             variant="outline"
+                                            onClick={() => requestRevision(attendance.id)}
+                                            className="border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 dark:border-amber-900 dark:text-amber-400 font-medium transition-all px-2"
+                                        >
+                                            <RefreshCcw className="w-4 h-4 mr-1.5" /> Revisi
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
                                             onClick={() => reject(attendance.id)}
-                                            className="border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800 dark:border-rose-900 dark:text-rose-400 font-medium transition-all"
+                                            className="border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800 dark:border-rose-900 dark:text-rose-400 font-medium transition-all px-2"
                                         >
                                             <XCircle className="w-4 h-4 mr-1.5" /> Tolak
                                         </Button>
@@ -259,14 +273,19 @@ export default function AttendanceVerify({
                                                             <CheckCheck className="w-3 h-3" />
                                                             Disetujui
                                                         </Badge>
-                                                    ) : (
+                                                    ) : item.status === 'ditolak' ? (
                                                         <Badge className="bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800 gap-1 font-semibold">
                                                             <Ban className="w-3 h-3" />
                                                             Ditolak
                                                         </Badge>
+                                                    ) : (
+                                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-500 dark:border-amber-800 gap-1 font-semibold">
+                                                            <RefreshCcw className="w-3 h-3" />
+                                                            Revisi
+                                                        </Badge>
                                                     )}
-                                                    {item.status === 'ditolak' && item.rejection_reason && (
-                                                        <div className="text-[10px] text-rose-500 mt-1 max-w-[120px] truncate" title={item.rejection_reason}>
+                                                    {(item.status === 'ditolak' || item.status === 'revisi') && item.rejection_reason && (
+                                                        <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 max-w-[120px] truncate" title={item.rejection_reason}>
                                                             {item.rejection_reason}
                                                         </div>
                                                     )}

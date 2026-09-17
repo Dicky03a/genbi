@@ -15,6 +15,7 @@ import {
     ChevronRight,
     Award,
     FileText,
+    RefreshCcw,
 } from 'lucide-react';
 
 type Submission = {
@@ -30,7 +31,7 @@ type HistoryItem = {
     id: number;
     title: string;
     points_requested: number;
-    status: 'disetujui' | 'ditolak';
+    status: 'disetujui' | 'ditolak' | 'revisi';
     created_at: string;
     verified_at: string | null;
     rejection_reason: string | null;
@@ -61,8 +62,13 @@ export default function SubmissionVerify({
 }) {
     const verify = (id: number) => router.patch(route('admin.submissions.verify', id));
     const reject = (id: number) => {
-        const reason = window.prompt('Alasan penolakan');
+        const reason = window.prompt('Alasan penolakan:');
         if (reason) router.patch(route('admin.submissions.reject', id), { reason });
+    };
+
+    const requestRevision = (id: number) => {
+        const reason = window.prompt('Alasan pengembalian untuk revisi:');
+        if (reason) router.patch(route('admin.submissions.request_revision', id), { reason });
     };
 
     const formatDate = (dateStr: string | null) => {
@@ -142,6 +148,14 @@ export default function SubmissionVerify({
                                             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all"
                                         >
                                             <CheckCircle2 className="w-4 h-4 mr-1.5" /> Setujui
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => requestRevision(submission.id)}
+                                            className="flex-1 border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 dark:border-amber-900 dark:text-amber-400 font-medium transition-all"
+                                        >
+                                            <RefreshCcw className="w-4 h-4 mr-1.5" /> Revisi
                                         </Button>
                                         <Button
                                             size="sm"
@@ -239,14 +253,19 @@ export default function SubmissionVerify({
                                                             <CheckCheck className="w-3 h-3" />
                                                             Disetujui
                                                         </Badge>
-                                                    ) : (
+                                                    ) : item.status === 'ditolak' ? (
                                                         <Badge className="bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800 gap-1 font-semibold">
                                                             <Ban className="w-3 h-3" />
                                                             Ditolak
                                                         </Badge>
+                                                    ) : (
+                                                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-500 dark:border-amber-800 gap-1 font-semibold">
+                                                            <RefreshCcw className="w-3 h-3" />
+                                                            Revisi
+                                                        </Badge>
                                                     )}
-                                                    {item.status === 'ditolak' && item.rejection_reason && (
-                                                        <div className="text-[10px] text-rose-500 mt-1 max-w-[120px] truncate" title={item.rejection_reason}>
+                                                    {(item.status === 'ditolak' || item.status === 'revisi') && item.rejection_reason && (
+                                                        <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 max-w-[120px] truncate" title={item.rejection_reason}>
                                                             {item.rejection_reason}
                                                         </div>
                                                     )}

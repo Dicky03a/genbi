@@ -17,6 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('avatar')->nullable();
+            $table->string('nim', 20)->nullable();
+            $table->string('prodi', 100)->nullable();
+            $table->string('angkatan', 4)->nullable();
+            $table->text('alamat')->nullable();
+            $table->foreignId('division_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('komisariat_id')->nullable()->constrained()->nullOnDelete();
+            $table->boolean('is_active')->default(true);
+            $table->index('is_active');
             $table->rememberToken();
             $table->timestamps();
         });

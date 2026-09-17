@@ -5,15 +5,16 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Camera, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Camera, RefreshCw, CheckCircle2, AlertCircle, ImagePlus, X } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
 type EventRole = { id: number; name: string; points: number };
 type PointRate = { id: number; name: string; points: number };
-type Event = { id: number; title: string; roles: EventRole[]; point_type: string };
+type Event = { id: number; title: string; roles: EventRole[]; point_type: string; validation_type?: string };
 type MyAttendance = {
     id: number;
     status: string;
+    rejection_reason?: string | null;
     event_role: { name: string; points: number } | null;
     point_rate: { name: string; points: number } | null;
     created_at: string;
@@ -184,7 +185,7 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
         }
 
         if (!data.photo) {
-            setError('photo', 'Foto selfie wajib diambil terlebih dahulu.');
+            setError('photo', event.validation_type === 'document' ? 'Dokumen bukti kehadiran wajib diunggah.' : 'Foto selfie wajib diambil terlebih dahulu.');
             return;
         }
 
@@ -212,6 +213,7 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
         fetch(route('events.attendances.store', event.id), {
             method: 'POST',
             body: payload,
+            credentials: 'same-origin',
             headers: {
                 Accept: 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
@@ -258,10 +260,12 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
                 <Card className="shadow-sm border border-slate-200 bg-white">
                     <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-4">
                         <CardTitle className="text-xl font-bold text-slate-900">{event.title}</CardTitle>
-                        <p className="text-xs text-slate-500 mt-1">Absensi Selfie Langsung (Kamera Depan Real-time)</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                            {event.validation_type === 'document' ? 'Absensi Menggunakan Unggah File / Dokumen' : 'Absensi Selfie Langsung (Kamera Depan Real-time)'}
+                        </p>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        {myAttendance ? (
+                        {myAttendance && !['revisi', 'ditolak'].includes(myAttendance.status) ? (
                             <div className="space-y-6 text-center py-2">
                                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800">
                                     <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
@@ -315,8 +319,23 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
                                 </div>
                             </div>
                         ) : (
-                            <form onSubmit={submit} className="space-y-6">
-                            {/* Role / Point Rate Selector */}
+                            <div className="space-y-6">
+                                {myAttendance && ['revisi', 'ditolak'].includes(myAttendance.status) && (
+                                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 flex items-start gap-3">
+                                        <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="font-bold text-amber-900">
+                                                {myAttendance.status === 'revisi' ? 'Absensi Anda Perlu Direvisi' : 'Absensi Anda Ditolak'}
+                                            </p>
+                                            <p className="mt-1 text-xs text-amber-700">
+                                                Alasan: <span className="font-semibold">{myAttendance.rejection_reason || 'Foto tidak memenuhi syarat.'}</span> <br/>
+                                                Silakan ambil ulang / unggah bukti baru.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                <form onSubmit={submit} className="space-y-6">
+                                {/* Role / Point Rate Selector */}
                             {event.point_type === 'role' ? (
                                 <div>
                                     <Label htmlFor="event_role_id" className="font-medium">
@@ -361,12 +380,52 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
                                 </div>
                             )}
 
-                            {/* Camera / Selfie Capture Area */}
+                            {/* Camera / Selfie or Document Capture Area */}
                             <div className="space-y-3">
                                 <Label className="font-medium">
-                                    Bukti Selfie (Kamera Depan) <span className="text-red-500">*</span>
+                                    {event.validation_type === 'document' ? 'Bukti Kehadiran (Foto/Screenshot)' : 'Bukti Selfie (Kamera Depan)'} <span className="text-red-500">*</span>
                                 </Label>
 
+                                {event.validation_type === 'document' ? (
+                                    <div className="flex items-center gap-4 mt-2">
+                                        {(photoPreview) ? (
+                                            <div className="relative group w-32 h-32 rounded-xl overflow-hidden border border-slate-200">
+                                                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setPhotoPreview(null);
+                                                        setData('photo', null);
+                                                    }}
+                                                    className="absolute top-1 right-1 bg-white/90 p-1.5 rounded-full text-slate-700 hover:text-rose-600 transition shadow-sm opacity-0 group-hover:opacity-100"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <label htmlFor="document-upload" className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition">
+                                                <ImagePlus className="w-6 h-6 text-slate-400 mb-2" />
+                                                <span className="text-xs font-medium text-slate-500">Pilih Gambar</span>
+                                            </label>
+                                        )}
+                                        <div className="flex-1">
+                                            <input
+                                                id="document-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        setData('photo', file);
+                                                        setPhotoPreview(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                            />
+                                            <p className="text-xs text-slate-500 mt-1 max-w-sm">Unggah gambar/screenshot bukti kehadiran (Maks 2MB).</p>
+                                        </div>
+                                    </div>
+                                ) : (
                                 <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-900 text-white min-h-[300px] flex items-center justify-center">
                                     {/* State 1: Initial state before camera started or photo taken */}
                                     {!isCameraActive && !photoPreview && (
@@ -444,11 +503,12 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
                                         </div>
                                     )}
                                 </div>
+                                )}
                                 <InputError message={errors.photo} />
                             </div>
 
-                            {/* Camera / Permission Error Message */}
-                            {cameraError && (
+                            {/* Camera / Permission Error Message (Only applicable for selfie) */}
+                            {event.validation_type !== 'document' && cameraError && (
                                 <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 flex items-start gap-3">
                                     <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                                     <div>
@@ -482,9 +542,10 @@ export default function AttendanceSubmit({ event, myAttendance, pointRates }: { 
                                 disabled={isSubmitting || !data.photo}
                                 className="w-full bg-primary font-medium py-2.5"
                             >
-                                {isSubmitting ? 'Mengirim Absensi...' : 'Kirim Absensi Selfie'}
+                                {isSubmitting ? 'Mengirim Absensi...' : (event.validation_type === 'document' ? 'Kirim Dokumen Absensi' : 'Kirim Absensi Selfie')}
                             </Button>
                             </form>
+                            </div>
                         )}
                     </CardContent>
                 </Card>

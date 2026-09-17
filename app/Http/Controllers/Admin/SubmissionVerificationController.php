@@ -61,4 +61,18 @@ class SubmissionVerificationController extends Controller
 
         return back()->with('success', 'Pengajuan berhasil ditolak.');
     }
+
+    public function requestRevision(Request $request, PointSubmission $submission): RedirectResponse
+    {
+        Gate::authorize('reject', $submission); // Reuse reject permission
+        $data = $request->validate(['reason' => ['required', 'string', 'max:1000']]);
+
+        try {
+            $this->service->requestRevision($submission, $request->user(), $data['reason']);
+        } catch (DomainException $exception) {
+            return back()->withErrors(['submission' => $exception->getMessage()]);
+        }
+
+        return back()->with('success', 'Pengajuan dikembalikan ke user untuk revisi.');
+    }
 }

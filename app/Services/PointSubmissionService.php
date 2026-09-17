@@ -68,8 +68,8 @@ class PointSubmissionService
         if ($submission->user_id !== $user->id) {
             throw new DomainException('Anda tidak dapat merevisi pengajuan milik anggota lain.');
         }
-        if ($submission->status !== 'ditolak') {
-            throw new DomainException('Hanya pengajuan yang ditolak yang dapat direvisi.');
+        if ($submission->status !== 'ditolak' && $submission->status !== 'revisi') {
+            throw new DomainException('Hanya pengajuan yang ditolak atau diminta revisi yang dapat dikirim ulang.');
         }
         $this->verificationState->assertCanTransition($submission->status, 'menunggu');
         if ($submission->revision_count >= config('attendance.submission_max_revisions')) {
@@ -133,6 +133,21 @@ class PointSubmissionService
         return DB::transaction(function () use ($submission, $actor, $reason): PointSubmission {
             $submission->rejection_reason = $reason;
             $this->changeStatus($submission, 'ditolak', $actor, $reason);
+
+            return $submission->refresh();
+        });
+    }
+
+    public function requestRevision(PointSubmission $submission, User $actor, string $reason): PointSubmission
+    {
+        $this->verificationState->assertCanTransition($submission->status, 'revisi');
+        if (trim($reason) === '') {
+            throw new DomainException('Alasan permintaan revisi wajib diisi.');
+        }
+
+        return DB::transaction(function () use ($submission, $actor, $reason): PointSubmission {
+            $submission->rejection_reason = $reason;
+            $this->changeStatus($submission, 'revisi', $actor, $reason);
 
             return $submission->refresh();
         });

@@ -24,6 +24,7 @@ class UpdateEventRequest extends StoreEventRequest
             'roles.*.points' => ['required_if:point_type,role', 'nullable', 'integer', 'min:0'],
             'point_rate_ids' => ['array', 'min:1', 'required_if:point_type,point_rate'],
             'point_rate_ids.*' => ['required_if:point_type,point_rate', 'integer', 'exists:point_rates,id'],
+            'validation_type' => ['required', 'string', 'in:selfie,document'],
             'poster' => ['nullable', 'image', 'max:2048'],
         ];
     }

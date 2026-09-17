@@ -17,12 +17,25 @@ class AttendanceController extends Controller
     public function store(StoreAttendanceRequest $request, Event $event): JsonResponse
     {
         try {
-            $attendance = $this->service->submit(
-                $request->user(),
-                $event,
-                $request->validated(),
-                $request->file('photo'),
-            );
+            $existing = \App\Models\Attendance::where('event_id', $event->id)
+                ->where('user_id', $request->user()->id)
+                ->first();
+
+            if ($existing && in_array($existing->status, ['ditolak', 'revisi'])) {
+                $attendance = $this->service->revise(
+                    $existing,
+                    $request->user(),
+                    $request->validated(),
+                    $request->file('photo')
+                );
+            } else {
+                $attendance = $this->service->submit(
+                    $request->user(),
+                    $event,
+                    $request->validated(),
+                    $request->file('photo'),
+                );
+            }
         } catch (DomainException $exception) {
             return response()->json([
                 'status' => false,
@@ -58,6 +71,7 @@ class AttendanceController extends Controller
             'myAttendance' => $myAttendance ? [
                 'id' => $myAttendance->id,
                 'status' => $myAttendance->status,
+                'rejection_reason' => $myAttendance->rejection_reason,
                 'event_role' => $myAttendance->eventRole ? [
                     'name' => $myAttendance->eventRole->name,
                     'points' => $myAttendance->eventRole->points,

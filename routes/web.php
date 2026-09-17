@@ -89,9 +89,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('absensi/{attendance}/foto', [AttendanceVerificationController::class, 'photo'])->name('attendances.photo');
         Route::patch('absensi/{attendance}/verifikasi', [AttendanceVerificationController::class, 'verify'])->name('attendances.verify');
         Route::patch('absensi/{attendance}/tolak', [AttendanceVerificationController::class, 'reject'])->name('attendances.reject');
+        Route::patch('absensi/{attendance}/minta-revisi', [AttendanceVerificationController::class, 'requestRevision'])->name('attendances.request_revision');
         Route::get('pengajuan', [SubmissionVerificationController::class, 'index'])->name('submissions.index');
         Route::patch('pengajuan/{submission}/verifikasi', [SubmissionVerificationController::class, 'verify'])->name('submissions.verify');
         Route::patch('pengajuan/{submission}/tolak', [SubmissionVerificationController::class, 'reject'])->name('submissions.reject');
+        Route::patch('pengajuan/{submission}/minta-revisi', [SubmissionVerificationController::class, 'requestRevision'])->name('submissions.request_revision');
         Route::get('rekap', [RecapController::class, 'index'])->name('recap.index');
         Route::get('rekap/ekspor', [RecapController::class, 'export'])->name('recap.export');
     });
@@ -111,6 +113,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pengajuan/{submission}/revisi', [PointSubmissionController::class, 'edit'])->name('submissions.edit');
     Route::put('pengajuan/{submission}', [PointSubmissionController::class, 'update'])->name('submissions.update');
     Route::get('poin', [PointController::class, 'index'])->name('points.index');
+    Route::get('poin/rekap', [PointController::class, 'recap'])->name('points.recap');
 
     Route::middleware('role:admin_komisariat|admin_korkom|superadmin|Superadmin|admin')->group(function () {
         Route::resource('dashboard/categories', CategoryController::class)->names('categories');

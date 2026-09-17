@@ -16,20 +16,19 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->string('point_type')->default('role');
             $table->dateTime('starts_at');
             $table->dateTime('ends_at');
-            $table->dateTime('opens_at');
-            $table->dateTime('closes_at');
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->unsignedInteger('radius_m')->nullable();
             $table->unsignedInteger('max_gps_accuracy_m')->nullable();
             $table->string('status')->default('draft');
+            $table->string('poster_path')->nullable();
             $table->timestamps();
 
             $table->index(['period_id', 'status']);
             $table->index(['komisariat_id', 'status']);
-            $table->index(['opens_at', 'closes_at']);
         });
     }
 

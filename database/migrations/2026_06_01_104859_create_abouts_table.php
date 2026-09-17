@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('tagline');
             $table->text('vision');
-            $table->string('mission', 255);
+            $table->text('mission');
             $table->longText('profile');
             $table->timestamps();
             $table->softDeletes();

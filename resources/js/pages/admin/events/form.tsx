@@ -28,6 +28,7 @@ type ExistingEvent = {
     roles: EventRole[];
     pointRates?: PointRate[];
     poster_url?: string;
+    validation_type?: string;
 };
 type EventForm = {
     komisariat_id: string;
@@ -40,6 +41,7 @@ type EventForm = {
     roles: EventRole[];
     point_rate_ids: number[];
     poster: File | null;
+    validation_type: string;
     _method?: 'put';
 };
 
@@ -59,6 +61,7 @@ export default function EventForm({ event, komisariats, availablePointRates }: {
         roles: event?.roles?.length ? event.roles : [emptyRole()],
         point_rate_ids: event?.pointRates?.map(pr => pr.id) ?? [],
         poster: null,
+        validation_type: event?.validation_type ?? 'selfie',
     });
     const [roleError, setRoleError] = useState('');
     const [posterPreview, setPosterPreview] = useState<string | null>(event?.poster_url ?? null);
@@ -243,6 +246,42 @@ export default function EventForm({ event, komisariats, availablePointRates }: {
                                         <InputError message={errors.ends_at} />
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                                <Label className="text-xs font-semibold text-slate-700 block mb-2">Tipe Validasi Presensi <span className="text-red-500">*</span></Label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${data.validation_type === 'selfie' ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                                        <input
+                                            type="radio"
+                                            name="validation_type"
+                                            value="selfie"
+                                            checked={data.validation_type === 'selfie'}
+                                            onChange={(e) => setData('validation_type', e.target.value)}
+                                            className="text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">Foto Selfie Langsung</p>
+                                            <p className="text-xs text-slate-500">Mewajibkan peserta mengambil foto pakai kamera/webcam.</p>
+                                        </div>
+                                    </label>
+                                    <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${data.validation_type === 'document' ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                                        <input
+                                            type="radio"
+                                            name="validation_type"
+                                            value="document"
+                                            checked={data.validation_type === 'document'}
+                                            onChange={(e) => setData('validation_type', e.target.value)}
+                                            className="text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">Unggah File Dokumen</p>
+                                            <p className="text-xs text-slate-500">Bebas pilih file/foto dari galeri (Cocok untuk acara online).</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                {/* @ts-ignore */}
+                                <InputError message={errors.validation_type} className="mt-1" />
                             </div>
                             
                             <div className="md:col-span-2 flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100 mt-2">

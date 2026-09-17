@@ -64,6 +64,20 @@ class AttendanceVerificationController extends Controller
         return back()->with('success', 'Absensi berhasil ditolak.');
     }
 
+    public function requestRevision(Request $request, Attendance $attendance): RedirectResponse
+    {
+        Gate::authorize('reject', $attendance); // Reuse reject permission
+        $data = $request->validate(['reason' => ['required', 'string', 'max:1000']]);
+
+        try {
+            $this->service->requestRevision($attendance, $request->user(), $data['reason']);
+        } catch (DomainException $exception) {
+            return back()->withErrors(['attendance' => $exception->getMessage()]);
+        }
+
+        return back()->with('success', 'Absensi dikembalikan ke user untuk revisi.');
+    }
+
     public function photo(Attendance $attendance): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         \Illuminate\Support\Facades\Gate::authorize('verify', $attendance);
