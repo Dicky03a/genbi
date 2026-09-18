@@ -20,6 +20,7 @@ interface Beasiswa {
     link: string | null;
     poster: string | null;
     is_published: boolean;
+    is_registration_open: boolean;
 }
 
 interface Props {
@@ -52,6 +53,7 @@ export default function BeasiswaEdit({ beasiswa }: Props) {
         link: beasiswa.link || '',
         poster: null as File | null,
         is_published: beasiswa.is_published,
+        is_registration_open: beasiswa.is_registration_open,
         _method: 'PUT',
     });
 
@@ -179,6 +181,15 @@ export default function BeasiswaEdit({ beasiswa }: Props) {
                                         onCheckedChange={(checked) => setData('is_published', checked)}
                                     />
                                     <Label htmlFor="is_published">Published</Label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Switch 
+                                        id="is_registration_open" 
+                                        checked={data.is_registration_open} 
+                                        onCheckedChange={(checked) => setData('is_registration_open', checked)}
+                                    />
+                                    <Label htmlFor="is_registration_open">Buka Pendaftaran (Open Registration Link)</Label>
                                 </div>
                             </div>
 

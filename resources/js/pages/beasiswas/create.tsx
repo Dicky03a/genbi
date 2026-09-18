@@ -34,7 +34,8 @@ export default function BeasiswaCreate() {
         flow: '',
         link: '',
         poster: null as File | null,
-        is_published: false,
+        is_published: false as boolean,
+        is_registration_open: false as boolean,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -152,6 +153,15 @@ export default function BeasiswaCreate() {
                                         onCheckedChange={(checked) => setData('is_published', checked)}
                                     />
                                     <Label htmlFor="is_published">Publish Immediately</Label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Switch 
+                                        id="is_registration_open" 
+                                        checked={data.is_registration_open} 
+                                        onCheckedChange={(checked) => setData('is_registration_open', checked)}
+                                    />
+                                    <Label htmlFor="is_registration_open">Buka Pendaftaran (Open Registration Link)</Label>
                                 </div>
                             </div>
 

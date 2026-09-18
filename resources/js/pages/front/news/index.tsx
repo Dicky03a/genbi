@@ -2,7 +2,7 @@ import { NewsCard } from '@/components/news-card';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { useGSAP } from '@gsap/react';
-import { Head } from '@inertiajs/react';
+import { Seo } from '@/components/seo';
 import { gsap } from 'gsap';
 import { useRef } from 'react';
 
@@ -44,20 +44,11 @@ export default function NewsIndex({ news }: NewsIndexProps) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title="Berita & Artikel | GenBI Unugiri">
-                <meta name="description" content={description} />
-                <meta property="og:title" content="Berita & Artikel | GenBI Unugiri" />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Berita & Artikel | GenBI Unugiri" />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <link rel="canonical" href={pageUrl} />
-            </Head>
+            <Seo 
+                title="Berita & Artikel | GenBI Unugiri" 
+                description={description} 
+                url={pageUrl} 
+            />
             <PublicNavbar />
 
             <main className="pt-2 md:pt-[40px]">

@@ -2,7 +2,7 @@ import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { useInitials } from '@/hooks/use-initials';
 import { useGSAP } from '@gsap/react';
-import { Head } from '@inertiajs/react';
+import { Seo } from '@/components/seo';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef } from 'react';
@@ -100,20 +100,12 @@ export default function DivisionShow({ division }: Props) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title={`Divisi ${division.name} | GenBI Unugiri`}>
-                <meta name="description" content={description} />
-                <meta property="og:title" content={`Divisi ${division.name} | GenBI Unugiri`} />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={imageUrl} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content={`Divisi ${division.name} | GenBI Unugiri`} />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={imageUrl} />
-                <link rel="canonical" href={pageUrl} />
-            </Head>
+            <Seo 
+                title={`Divisi ${division.name} | GenBI Unugiri`}
+                description={description}
+                image={imageUrl}
+                url={pageUrl}
+            />
             <PublicNavbar />
 
             <main className="pt-0 md:pt-[100px]">

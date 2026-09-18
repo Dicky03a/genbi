@@ -48,6 +48,7 @@ Route::get('berita', [NewsController::class, 'publicIndex'])->name('berita.index
 Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('berita.show');
 
 Route::get('beasiswa', [BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
+Route::post('beasiswa/{beasiswa}/subscribe', [\App\Http\Controllers\BeasiswaSubscriberController::class, 'store'])->name('beasiswa.subscribe');
 
 Route::get('divisi', [DivisionController::class, 'publicIndex'])->name('divisi.index');
 Route::get('divisi/{division}', [DivisionController::class, 'publicShow'])->name('divisi.show');

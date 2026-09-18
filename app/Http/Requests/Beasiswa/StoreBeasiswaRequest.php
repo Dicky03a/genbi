@@ -31,6 +31,7 @@ class StoreBeasiswaRequest extends FormRequest
             'link' => ['nullable', 'url', 'max:255'],
             'poster' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'is_published' => ['required', 'boolean'],
+            'is_registration_open' => ['required', 'boolean'],
         ];
     }
 }

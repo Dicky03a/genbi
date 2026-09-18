@@ -1,7 +1,7 @@
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
-import { Head } from '@inertiajs/react';
+import { Seo } from '@/components/seo';
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { useRef } from 'react';
@@ -57,20 +57,11 @@ export default function ProfileIndex({ about }: ProfileProps) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title="Profil Kami | GenBI Unugiri">
-                <meta name="description" content={description} />
-                <meta property="og:title" content="Profil Kami | GenBI Unugiri" />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Profil Kami | GenBI Unugiri" />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <link rel="canonical" href={pageUrl} />
-            </Head>
+            <Seo 
+                title="Profil Kami | GenBI Unugiri" 
+                description={description} 
+                url={pageUrl} 
+            />
             <PublicNavbar />
 
             <main className="pt-[20px]">

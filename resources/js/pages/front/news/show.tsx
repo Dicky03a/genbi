@@ -3,7 +3,7 @@ import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
 import { useGSAP } from '@gsap/react';
-import { Head } from '@inertiajs/react';
+import { Seo } from '@/components/seo';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { gsap } from 'gsap';
@@ -25,26 +25,20 @@ export default function NewsShow({ news, recentNews }: NewsShowProps) {
         ? `${origin}/storage/${news.image_path}`
         : `${origin}/asset/foto/home-1920.webp`;
 
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.textContent = JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'NewsArticle',
-            headline: news.title,
-            image: news.image_path ? [`${origin}/storage/${news.image_path}`] : [],
-            datePublished: news.published_at,
-            author: { '@type': 'Person', name: news.author?.name || 'Admin' },
-            publisher: {
-                '@type': 'Organization',
-                name: 'GenBI Unugiri',
-                logo: { '@type': 'ImageObject', url: `${origin}/asset/logo/Horizontal Stack Up Lock Up.webp` },
-            },
-            description,
-        });
-        document.head.appendChild(script);
-        return () => { document.head.removeChild(script); };
-    }, [news.id]);
+    const jsonLdData = {
+        '@context': 'https://schema.org',
+        '@type': 'NewsArticle',
+        headline: news.title,
+        image: news.image_path ? [`${origin}/storage/${news.image_path}`] : [],
+        datePublished: news.published_at,
+        author: { '@type': 'Person', name: news.author?.name || 'Admin' },
+        publisher: {
+            '@type': 'Organization',
+            name: 'GenBI Unugiri',
+            logo: { '@type': 'ImageObject', url: `${origin}/asset/logo/Horizontal Stack Up Lock Up.webp` },
+        },
+        description,
+    };
 
     useGSAP(
         () => {
@@ -90,23 +84,14 @@ export default function NewsShow({ news, recentNews }: NewsShowProps) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title={`${news.title} | GenBI Unugiri`}>
-                <meta name="description" content={description} />
-                <meta property="og:title" content={`${news.title} | GenBI Unugiri`} />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={imageUrl} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="article" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta property="article:published_time" content={news.published_at} />
-                <meta property="article:author" content={news.author?.name || 'Admin'} />
-                <meta property="article:section" content={news.category?.name} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content={`${news.title} | GenBI Unugiri`} />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={imageUrl} />
-                <link rel="canonical" href={pageUrl} />
-            </Head>
+            <Seo 
+                title={`${news.title} | GenBI Unugiri`}
+                description={description}
+                image={imageUrl}
+                url={pageUrl}
+                type="article"
+                jsonLd={jsonLdData}
+            />
             <PublicNavbar />
 
             <main className="pt-8 md:pt-[120px]">

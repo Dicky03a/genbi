@@ -5,6 +5,7 @@ import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
 import { HomeSection } from '@/pages/front/home';
 import { type SharedData } from '@/types';
+import { Seo } from '@/components/seo';
 import { useGSAP } from '@gsap/react';
 import { Head } from '@inertiajs/react';
 import { gsap } from 'gsap';
@@ -27,6 +28,15 @@ export default function App({ about, latestNews }: AppPageProps) {
     const description = about.tagline
         ? stripHtml(about.tagline).substring(0, 155)
         : 'Membangun masa depan pemimpin bangsa yang berintegritas dan inovatif.';
+
+    const jsonLdData = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'GenBI Unugiri',
+        url: origin,
+        logo: `${origin}/asset/logo/Horizontal Stack Up Lock Up.webp`,
+        description: 'Generasi Baru Indonesia (GenBI) Komisariat Universitas Nahdlatul Ulama Sunan Giri',
+    };
 
     useGSAP(
         () => {
@@ -61,19 +71,14 @@ export default function App({ about, latestNews }: AppPageProps) {
 
     return (
         <div className="min-h-screen bg-[#ffffff] font-sans text-[#1d1d1f] selection:bg-[#0066cc]/20 selection:text-[#0066cc]">
-            <Head title="GenBI Unugiri | Generasi Baru Indonesia">
-                <meta name="description" content={description} />
-                <meta property="og:title" content="GenBI Unugiri | Generasi Baru Indonesia" />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="GenBI Unugiri | Generasi Baru Indonesia" />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <link rel="canonical" href={pageUrl} />
+            <Seo 
+                title="GenBI Unugiri | Generasi Baru Indonesia"
+                description={description}
+                image="/asset/foto/home-1920.webp"
+                url={pageUrl}
+                jsonLd={jsonLdData}
+            />
+            <Head>
                 <link rel="preload" as="image" href="/asset/foto/home.webp" fetchPriority="high" />
             </Head>
 

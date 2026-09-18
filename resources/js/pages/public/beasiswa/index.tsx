@@ -2,11 +2,23 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { useGSAP } from '@gsap/react';
-import { Head } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { Seo } from '@/components/seo';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CheckCircle2, ExternalLink, FileText, Info, ListChecks } from 'lucide-react';
-import { useRef } from 'react';
+import { CheckCircle2, ExternalLink, FileText, Info, ListChecks, Bell } from 'lucide-react';
+import { useRef, useState, FormEvent } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import InputError from '@/components/input-error';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +32,7 @@ interface Beasiswa {
     flow: string;
     link: string | null;
     poster: string | null;
+    is_registration_open: boolean;
 }
 
 interface Props {
@@ -28,6 +41,31 @@ interface Props {
 
 export default function BeasiswaIndex({ beasiswas }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [selectedBeasiswa, setSelectedBeasiswa] = useState<Beasiswa | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+        phone_number: '',
+    });
+
+    const openSubscribeModal = (beasiswa: Beasiswa) => {
+        setSelectedBeasiswa(beasiswa);
+        setIsModalOpen(true);
+        clearErrors();
+        reset();
+    };
+
+    const handleSubscribe = (e: FormEvent) => {
+        e.preventDefault();
+        if (selectedBeasiswa) {
+            post(route('beasiswa.subscribe', selectedBeasiswa.id), {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    reset();
+                },
+            });
+        }
+    };
 
     useGSAP(
         () => {
@@ -65,20 +103,11 @@ export default function BeasiswaIndex({ beasiswas }: Props) {
 
     return (
         <div ref={containerRef} className="min-h-screen bg-white font-sans text-[#1d1d1f]">
-            <Head title="Informasi Beasiswa | GenBI Unugiri">
-                <meta name="description" content={description} />
-                <meta property="og:title" content="Informasi Beasiswa | GenBI Unugiri" />
-                <meta property="og:description" content={description} />
-                <meta property="og:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <meta property="og:url" content={pageUrl} />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="GenBI Unugiri" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Informasi Beasiswa | GenBI Unugiri" />
-                <meta name="twitter:description" content={description} />
-                <meta name="twitter:image" content={`${origin}/asset/foto/home-1920.webp`} />
-                <link rel="canonical" href={pageUrl} />
-            </Head>
+            <Seo 
+                title="Informasi Beasiswa | GenBI Unugiri" 
+                description={description} 
+                url={pageUrl} 
+            />
             <PublicNavbar />
 
             <main className="pt-4 md:pt-[10px]">
@@ -189,19 +218,35 @@ export default function BeasiswaIndex({ beasiswas }: Props) {
                                                     </div>
                                                 </div>
 
-                                                {item.link && (
-                                                    <div className="mt-10 md:mt-20">
-                                                        <a
-                                                            href={item.link}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="inline-flex h-[48px] items-center gap-2 rounded-full bg-[#0066cc] px-6 text-[16px] font-medium text-white transition-all hover:bg-[#0071e3] hover:shadow-[0_12px_30px_rgba(0,102,204,0.3)] active:scale-95 md:h-[56px] md:gap-3 md:px-10 md:text-[18px]"
-                                                        >
-                                                            Daftar Sekarang
-                                                            <ExternalLink className="h-4 w-4 md:h-5 md:w-5" />
-                                                        </a>
-                                                    </div>
-                                                )}
+                                                <div className="mt-10 md:mt-20">
+                                                    {item.is_registration_open ? (
+                                                        item.link && (
+                                                            <a
+                                                                href={item.link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex h-[48px] items-center gap-2 rounded-full bg-[#0066cc] px-6 text-[16px] font-medium text-white transition-all hover:bg-[#0071e3] hover:shadow-[0_12px_30px_rgba(0,102,204,0.3)] active:scale-95 md:h-[56px] md:gap-3 md:px-10 md:text-[18px]"
+                                                            >
+                                                                Daftar Sekarang
+                                                                <ExternalLink className="h-4 w-4 md:h-5 md:w-5" />
+                                                            </a>
+                                                        )
+                                                    ) : (
+                                                        <div className="flex flex-col gap-4">
+                                                            <div className="inline-flex h-[48px] items-center justify-start rounded-full px-6 py-2 border border-gray-200 bg-gray-50 text-[15px] md:text-[17px] text-gray-500 w-fit">
+                                                                Pendaftaran belum dibuka
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => openSubscribeModal(item)}
+                                                                className="inline-flex h-[48px] w-fit items-center gap-2 rounded-full border border-[#0066cc] bg-transparent px-6 text-[16px] font-medium text-[#0066cc] transition-all hover:bg-[#0066cc] hover:text-white active:scale-95 md:h-[56px] md:gap-3 md:px-10 md:text-[18px]"
+                                                            >
+                                                                <Bell className="h-4 w-4 md:h-5 md:w-5" />
+                                                                Ingatkan Saya
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -218,6 +263,38 @@ export default function BeasiswaIndex({ beasiswas }: Props) {
                     </div>
                 </section>
             </main>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Dapatkan Pengingat Pendaftaran</DialogTitle>
+                        <DialogDescription>
+                            Masukkan nomor handphone (WhatsApp) Anda. Kami akan mengirimkan notifikasi saat pendaftaran beasiswa ini dibuka.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubscribe} className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="phone_number">Nomor Handphone</Label>
+                            <Input
+                                id="phone_number"
+                                type="text"
+                                placeholder="081234567890"
+                                value={data.phone_number}
+                                onChange={(e) => setData('phone_number', e.target.value)}
+                            />
+                            <InputError message={errors.phone_number} />
+                        </div>
+                        <div className="flex justify-end gap-2 pt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                                Batal
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                Simpan Pengingat
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <PublicFooter />
         </div>

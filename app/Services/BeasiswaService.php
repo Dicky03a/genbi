@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Beasiswa;
+use App\Jobs\NotifyBeasiswaOpened;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -48,7 +49,15 @@ class BeasiswaService
             $data['poster'] = $data['poster']->store('beasiswas', 'public');
         }
 
+        $wasRegistrationClosed = !$beasiswa->is_registration_open;
+
         $beasiswa->update($data);
+
+        // Check if registration was just opened
+        if ($wasRegistrationClosed && $beasiswa->is_registration_open) {
+            NotifyBeasiswaOpened::dispatch($beasiswa);
+        }
+
         return $beasiswa;
     }
 
