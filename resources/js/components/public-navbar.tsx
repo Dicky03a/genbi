@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Award, Building2, GraduationCap, Home, LayoutGrid, Newspaper, User, Users, X } from 'lucide-react';
+import { Award, Building2, GraduationCap, Home, LayoutGrid, Newspaper, User, Users, X, FileText, ChevronDown, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from './app-logo-icon';
 
@@ -32,9 +32,191 @@ const normalizePath = (url: string) => {
 interface NavItemData {
     id: string;
     label: string;
-    url: string;
+    url?: string;
     icon: React.ElementType;
     metadata?: string | number | React.ReactNode;
+    children?: NavItemData[];
+}
+
+function DesktopDropdown({
+    item,
+    currentPath,
+    prefersReducedMotion,
+}: {
+    item: NavItemData;
+    currentPath: string;
+    prefersReducedMotion: boolean | null;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const isActive = item.children?.some((child) => child.url && currentPath === normalizePath(child.url));
+
+    return (
+        <div
+            className="relative flex items-center"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+        >
+            <motion.div
+                whileHover={prefersReducedMotion ? undefined : { y: -1 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+                className="rounded-full"
+            >
+                <button
+                    className="relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors duration-150 h-[34px]"
+                    style={{ color: isActive ? ACCENT_DEEP : INK, fontWeight: isActive ? 600 : 500 }}
+                >
+                    {isActive ? (
+                        <motion.div
+                            layoutId="desktop-active-pill"
+                            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.86 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="absolute inset-0 rounded-full"
+                            style={{
+                                background: 'linear-gradient(180deg, #FFFFFF 0%, #F5F7FF 100%)',
+                                border: '1px solid rgba(59, 91, 219, 0.15)',
+                                boxShadow: '0 2px 10px -2px rgba(59, 91, 219, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                            }}
+                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 30 }}
+                        />
+                    ) : (
+                        <div className="absolute inset-0 rounded-full transition-colors duration-150 hover:bg-black/[0.04]" />
+                    )}
+                    <span className="relative flex items-center gap-1">
+                        {item.label}
+                        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", isOpen && "rotate-180")} />
+                    </span>
+                </button>
+            </motion.div>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute top-full left-1/2 mt-2 w-[220px] -translate-x-1/2 origin-top rounded-2xl p-2 z-50"
+                        style={{
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            backdropFilter: 'blur(24px)',
+                            border: '1px solid rgba(18, 18, 31, 0.08)',
+                            boxShadow: '0 24px 54px -12px rgba(18,18,31,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
+                        }}
+                    >
+                        <div className="flex flex-col gap-1">
+                            {item.children?.map((child) => {
+                                const isChildActive = child.url && currentPath === normalizePath(child.url);
+                                const Icon = child.icon;
+                                return (
+                                    <Link
+                                        key={child.id}
+                                        href={child.url!}
+                                        className={cn(
+                                            "group flex items-center gap-3.5 rounded-xl px-3 py-3 transition-all duration-200",
+                                            isChildActive ? "bg-[#EEF1FD]" : "hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-black/5"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] transition-all duration-200",
+                                            isChildActive 
+                                                ? "bg-[#3B5BDB] text-white shadow-md shadow-[#3B5BDB]/20" 
+                                                : "bg-black/[0.04] text-[#5B6172] group-hover:bg-[#3B5BDB] group-hover:text-white group-hover:shadow-md group-hover:shadow-[#3B5BDB]/20"
+                                        )}>
+                                            <Icon className="h-4 w-4" strokeWidth={isChildActive ? 2.5 : 2.2} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={cn(
+                                                "text-[14px] font-semibold transition-colors",
+                                                isChildActive ? "text-[#2A3FA8]" : "text-[#12121F] group-hover:text-[#3B5BDB]"
+                                            )}>
+                                                {child.label}
+                                            </span>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+const MobileDropdown = ({ item, currentPath }: { item: NavItemData; currentPath: string }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const isActive = item.children?.some((child) => child.url && currentPath === normalizePath(child.url));
+
+    return (
+        <div className="mb-0.5 flex flex-col last:mb-0">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={cn(
+                    'group flex h-[52px] items-center justify-between rounded-[12px] px-3 transition-colors duration-150 w-full',
+                    !isActive && !isOpen && 'hover:bg-black/[0.04]',
+                )}
+                style={{ background: isActive || isOpen ? ACCENT_SOFT : 'transparent' }}
+            >
+                <div className="flex items-center gap-3">
+                    <item.icon
+                        className="h-5 w-5 transition-colors"
+                        style={{ color: isActive || isOpen ? ACCENT : INK_SOFT }}
+                        strokeWidth={isActive || isOpen ? 2.5 : 2}
+                    />
+                    <span className="text-[15px] font-medium" style={{ color: isActive || isOpen ? ACCENT : INK }}>
+                        {item.label}
+                    </span>
+                </div>
+                <ChevronDown
+                    className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        isOpen && "rotate-180"
+                    )}
+                    style={{ color: isActive || isOpen ? ACCENT : INK_SOFT }}
+                />
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="mt-1 flex flex-col gap-1 pl-4 pr-1 py-1">
+                            {item.children?.map((child) => {
+                                const isChildActive = child.url && currentPath === normalizePath(child.url);
+                                const Icon = child.icon;
+                                return (
+                                    <Link
+                                        key={child.id}
+                                        href={child.url!}
+                                        className={cn(
+                                            "flex h-[44px] items-center gap-3 rounded-[10px] px-3 transition-colors duration-150",
+                                            isChildActive ? "bg-[#3B5BDB]/10" : "hover:bg-black/[0.03]"
+                                        )}
+                                    >
+                                        <Icon
+                                            className="h-4 w-4"
+                                            style={{ color: isChildActive ? ACCENT : INK_SOFT }}
+                                            strokeWidth={isChildActive ? 2.5 : 2}
+                                        />
+                                        <span
+                                            className="text-[14px] font-medium"
+                                            style={{ color: isChildActive ? ACCENT : INK }}
+                                        >
+                                            {child.label}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }
 
 export function PublicNavbar() {
@@ -77,9 +259,17 @@ export function PublicNavbar() {
         { id: 'home', label: 'Home', url: '/', icon: Home },
         { id: 'profile', label: 'Profil', url: '/profile', icon: Building2 },
         { id: 'beasiswa', label: 'Beasiswa', url: '/beasiswa', icon: GraduationCap },
-        { id: 'berita', label: 'Berita', url: '/berita', icon: Newspaper },
-        { id: 'prestasi', label: 'Prestasi', url: '/prestasi', icon: Award },
         { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },
+        { 
+            id: 'informasi', 
+            label: 'Informasi', 
+            icon: Info, 
+            children: [
+                { id: 'berita', label: 'Berita', url: '/berita', icon: Newspaper },
+                { id: 'prestasi', label: 'Prestasi', url: '/prestasi', icon: Award },
+                { id: 'template-file', label: 'Template File', url: '/template-file', icon: FileText },
+            ] 
+        },
     ];
 
     // Dihitung sekali, dipakai di 2 tempat (desktop dashboard link & dropdown mobile) — di kode asli logic role-check ini ditulis dua kali terpisah.
@@ -87,9 +277,7 @@ export function PublicNavbar() {
     const dashboardUrl = isAdmin ? '/dashboard' : '/user/dashboard';
 
     const dropdownMenuItems: NavItemData[] = [
-        { id: 'home', label: 'Home', url: '/', icon: Home },
-        { id: 'prestasi', label: 'Prestasi', url: '/prestasi', icon: Award },
-        { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },
+        ...navItems,
         { id: 'dashboard', label: 'Dashboard', url: dashboardUrl, icon: LayoutGrid },
     ];
 
@@ -124,18 +312,29 @@ export function PublicNavbar() {
                 {/* Center: Navigation — satu indicator pill yang "meluncur" antar item aktif */}
                 <nav className="flex items-center gap-1">
                     {navItems.map((item) => {
-                        const isActive = currentPath === normalizePath(item.url);
+                        if (item.children) {
+                            return (
+                                <DesktopDropdown
+                                    key={item.id}
+                                    item={item}
+                                    currentPath={currentPath}
+                                    prefersReducedMotion={prefersReducedMotion}
+                                />
+                            );
+                        }
+
+                        const isActive = item.url && currentPath === normalizePath(item.url);
                         return (
                             <motion.div
                                 key={item.id}
                                 whileHover={prefersReducedMotion ? undefined : { y: -1 }}
                                 whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
-                                className="rounded-full"
+                                className="rounded-full h-[34px] flex items-center"
                             >
                                 <Link
-                                    href={item.url}
+                                    href={item.url!}
                                     aria-current={isActive ? 'page' : undefined}
-                                    className="relative block rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors duration-150"
+                                    className="relative flex items-center justify-center rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors duration-150 h-full"
                                     style={{ color: isActive ? ACCENT_DEEP : INK, fontWeight: isActive ? 600 : 500 }}
                                 >
                                     {isActive ? (
@@ -203,13 +402,13 @@ export function PublicNavbar() {
                     className="flex h-[68px] items-center justify-between rounded-[26px] px-1.5 backdrop-blur-2xl sm:px-2"
                     style={{ background: 'rgba(252, 252, 254, 0.82)', border: '1px solid rgba(255, 255, 255, 0.7)', boxShadow: glassShadow(true) }}
                 >
-                    {navItems.slice(0, 5).map((item) => {
-                        const isActive = currentPath === normalizePath(item.url) && !mobileMenuOpen;
+                    {navItems.filter((item) => !item.children).slice(0, 4).map((item) => {
+                        const isActive = item.url && currentPath === normalizePath(item.url) && !mobileMenuOpen;
                         const Icon = item.icon;
                         return (
                             <Link
                                 key={item.id}
-                                href={item.url}
+                                href={item.url!}
                                 aria-current={isActive ? 'page' : undefined}
                                 className={cn(
                                     "relative flex h-[54px] items-center justify-center",
@@ -363,12 +562,16 @@ export function PublicNavbar() {
                             {/* Menu Rows */}
                             <div className="p-2.5">
                                 {dropdownMenuItems.map((item) => {
-                                    const isActive = currentPath === normalizePath(item.url);
+                                    if (item.children) {
+                                        return <MobileDropdown key={item.id} item={item} currentPath={currentPath} />;
+                                    }
+
+                                    const isActive = item.url && currentPath === normalizePath(item.url);
                                     const Icon = item.icon;
                                     return (
                                         <Link
                                             key={item.id}
-                                            href={item.url}
+                                            href={item.url!}
                                             aria-current={isActive ? 'page' : undefined}
                                             className={cn(
                                                 'group mb-0.5 flex h-[52px] items-center justify-between rounded-[12px] px-3 transition-colors duration-150 last:mb-0',

@@ -20,6 +20,7 @@ import {
     Users,
     WalletCards,
     HelpCircle,
+    FileText,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -67,6 +68,7 @@ export function AppSidebar() {
                       { title: 'Info Beasiswa', url: '/dashboard/beasiswas', icon: Info },
                       { title: 'FAQ Beasiswa', url: '/dashboard/beasiswa-faqs', icon: HelpCircle },
                       { title: 'Prestasi', url: '/dashboard/prestasis', icon: Award },
+                      { title: 'Template File', url: '/dashboard/template-files', icon: FileText },
                   ],
               },
               { title: 'Divisi', url: '/dashboard/divisions', icon: Users },

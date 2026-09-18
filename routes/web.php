@@ -61,6 +61,10 @@ Route::get('privacy-policy', fn() => Inertia::render('front/privacy-policy'))->n
 Route::get('terms-of-use', fn() => Inertia::render('front/terms-of-use'))->name('terms-of-use');
 Route::get('sitemap', fn() => Inertia::render('front/sitemap'))->name('sitemap');
 
+Route::get('template-file', [\App\Http\Controllers\TemplateFileController::class, 'publicIndex'])->name('template-file.index');
+Route::get('template-file/{templateFile}/download', [\App\Http\Controllers\TemplateFileController::class, 'download'])->name('template-file.download');
+
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware('role:admin_komisariat|admin_korkom|superadmin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('periode', [PeriodController::class, 'index'])->name('periods.index');
@@ -133,6 +137,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('dashboard/beasiswa-faqs', BeasiswaFaqController::class)->names('beasiswa-faqs');
 
         Route::resource('dashboard/prestasis', PrestasiController::class)->names('prestasis');
+
+        Route::resource('dashboard/template-files', \App\Http\Controllers\TemplateFileController::class)->names('template-files');
 
         Route::resource('dashboard/users', UserController::class)->names('users');
     });
