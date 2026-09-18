@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Building2, GraduationCap, Home, LayoutGrid, Newspaper, User, Users, X } from 'lucide-react';
+import { Award, Building2, GraduationCap, Home, LayoutGrid, Newspaper, User, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from './app-logo-icon';
 
@@ -78,6 +78,7 @@ export function PublicNavbar() {
         { id: 'profile', label: 'Profil', url: '/profile', icon: Building2 },
         { id: 'beasiswa', label: 'Beasiswa', url: '/beasiswa', icon: GraduationCap },
         { id: 'berita', label: 'Berita', url: '/berita', icon: Newspaper },
+        { id: 'prestasi', label: 'Prestasi', url: '/prestasi', icon: Award },
         { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },
     ];
 
@@ -87,6 +88,8 @@ export function PublicNavbar() {
 
     const dropdownMenuItems: NavItemData[] = [
         { id: 'home', label: 'Home', url: '/', icon: Home },
+        { id: 'prestasi', label: 'Prestasi', url: '/prestasi', icon: Award },
+        { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },
         { id: 'dashboard', label: 'Dashboard', url: dashboardUrl, icon: LayoutGrid },
     ];
 

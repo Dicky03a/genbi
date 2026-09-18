@@ -18,6 +18,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\PointSubmissionController;
+use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\UserController;
 use App\Models\About;
 use App\Models\News;
@@ -47,6 +48,8 @@ Route::get('/', function () {
 Route::get('profile', [AboutController::class, 'publicProfile'])->name('profile');
 Route::get('berita', [NewsController::class, 'publicIndex'])->name('berita.index');
 Route::get('berita/{news:slug}', [NewsController::class, 'publicShow'])->name('berita.show');
+
+Route::get('prestasi', [PrestasiController::class, 'publicIndex'])->name('prestasi.index');
 
 Route::get('beasiswa', [BeasiswaController::class, 'publicIndex'])->name('beasiswa.index');
 Route::post('beasiswa/{beasiswa}/subscribe', [\App\Http\Controllers\BeasiswaSubscriberController::class, 'store'])->name('beasiswa.subscribe');
@@ -128,6 +131,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('dashboard/beasiswas', BeasiswaController::class)->names('beasiswas');
         Route::resource('dashboard/beasiswa-faqs', BeasiswaFaqController::class)->names('beasiswa-faqs');
+
+        Route::resource('dashboard/prestasis', PrestasiController::class)->names('prestasis');
 
         Route::resource('dashboard/users', UserController::class)->names('users');
     });

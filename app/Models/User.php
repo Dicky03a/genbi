@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->hasMany(PointTransaction::class);
     }
 
+    public function prestasis(): HasMany
+    {
+        return $this->hasMany(Prestasi::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
