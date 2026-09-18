@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { useInitials } from '@/hooks/use-initials';
+import { ImageCropper } from '@/components/image-cropper';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Profile settings', href: '/settings/profile' },
@@ -26,6 +27,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const getInitials = useInitials();
 
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [uncroppedSrc, setUncroppedSrc] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm({
@@ -45,10 +48,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] ?? null;
-        setData('avatar', file);
+        const file = e.target.files?.[0];
         if (file) {
-            setAvatarPreview(URL.createObjectURL(file));
+            setUncroppedSrc(URL.createObjectURL(file));
+            setIsCropperOpen(true);
         }
     };
 
@@ -212,6 +215,22 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                 </div>
 
                 <DeleteUser />
+
+                {isCropperOpen && (
+                    <ImageCropper
+                        isOpen={isCropperOpen}
+                        onClose={() => {
+                            setIsCropperOpen(false);
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        imageSrc={uncroppedSrc}
+                        onCropCompleteAction={(croppedFile) => {
+                            setData('avatar', croppedFile);
+                            setAvatarPreview(URL.createObjectURL(croppedFile));
+                            setIsCropperOpen(false);
+                        }}
+                    />
+                )}
             </SettingsLayout>
         </AppLayout>
     );

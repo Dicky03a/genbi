@@ -54,7 +54,7 @@ export default function EventShow({ event, myAttendance }: { event: Event; myAtt
     return (
         <AppLayout breadcrumbs={[{ title: 'Acara', href: '/acara' } as BreadcrumbItem, { title: event.title, href: '#' }]}>
             <Head title={event.title} />
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
                 <Card className="mx-auto max-w-2xl overflow-hidden">
                     {event.poster_url && (
                         <div className="w-full h-56 md:h-80 bg-slate-100 overflow-hidden border-b border-slate-100">

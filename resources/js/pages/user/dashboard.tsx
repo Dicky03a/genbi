@@ -56,7 +56,7 @@ export default function Dashboard({ recap, openEvents = [] }: DashboardProps) {
                 <Card>
                     <CardContent className="flex flex-col items-center gap-5 pt-6 sm:flex-row sm:items-start">
                         <Avatar className="h-20 w-20 shrink-0">
-                            <AvatarImage src={user.avatar ? `/storage/${user.avatar}` : undefined} alt={user.name} />
+                            <AvatarImage src={user.avatar ? (user.avatar.startsWith('http') ? user.avatar : `/storage/${user.avatar}`) : undefined} alt={user.name} />
                             <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
 
@@ -116,24 +116,25 @@ export default function Dashboard({ recap, openEvents = [] }: DashboardProps) {
                                 <Link
                                     key={event.id}
                                     href={`/acara/${event.slug}`}
-                                    className="hover:bg-muted/30 flex items-center justify-between rounded border p-3 text-sm transition"
+                                    className="hover:bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded border p-3.5 text-sm transition"
                                 >
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium">{event.title}</span>
-                                        <span className="text-xs text-muted-foreground">• {event.komisariat?.name ?? 'Semua komisariat'}</span>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                        <span className="font-medium line-clamp-1 sm:line-clamp-none">{event.title}</span>
+                                        <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
+                                        <span className="text-xs text-muted-foreground">{event.komisariat?.name ?? 'Semua komisariat'}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {event.my_attendance_status === 'disetujui' && (
-                                            <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Disetujui</span>
+                                            <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] sm:text-xs px-2.5 py-1 sm:py-0.5 rounded-full font-medium">Disetujui</span>
                                         )}
                                         {event.my_attendance_status === 'ditolak' && (
-                                            <span className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Ditolak</span>
+                                            <span className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-[10px] sm:text-xs px-2.5 py-1 sm:py-0.5 rounded-full font-medium">Ditolak</span>
                                         )}
                                         {event.my_attendance_status === 'menunggu' && (
-                                            <span className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs px-2.5 py-0.5 rounded-full font-medium">Menunggu Verifikasi</span>
+                                            <span className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] sm:text-xs px-2.5 py-1 sm:py-0.5 rounded-full font-medium">Menunggu Verifikasi</span>
                                         )}
                                         {!event.my_attendance_status && (
-                                            <span className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full">Belum Absen</span>
+                                            <span className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-[10px] sm:text-xs px-2.5 py-1 sm:py-0.5 rounded-full">Belum Absen</span>
                                         )}
                                     </div>
                                 </Link>

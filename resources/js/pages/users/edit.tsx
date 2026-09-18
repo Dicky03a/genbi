@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { ImageCropper } from '@/components/image-cropper';
 import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -39,6 +40,8 @@ interface Props {
 
 export default function UsersEdit({ user, roles, divisions }: Props) {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [uncroppedSrc, setUncroppedSrc] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const currentAvatar = avatarPreview ?? (user.avatar ? `/storage/${user.avatar}` : null);
@@ -63,9 +66,11 @@ export default function UsersEdit({ user, roles, divisions }: Props) {
     };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] ?? null;
-        setData('avatar', file);
-        if (file) setAvatarPreview(URL.createObjectURL(file));
+        const file = e.target.files?.[0];
+        if (file) {
+            setUncroppedSrc(URL.createObjectURL(file));
+            setIsCropperOpen(true);
+        }
     };
 
     return (
@@ -209,6 +214,21 @@ export default function UsersEdit({ user, roles, divisions }: Props) {
                         </div>
                     </div>
                 </form>
+                {isCropperOpen && (
+                    <ImageCropper
+                        isOpen={isCropperOpen}
+                        onClose={() => {
+                            setIsCropperOpen(false);
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        imageSrc={uncroppedSrc}
+                        onCropCompleteAction={(croppedFile) => {
+                            setData('avatar', croppedFile);
+                            setAvatarPreview(URL.createObjectURL(croppedFile));
+                            setIsCropperOpen(false);
+                        }}
+                    />
+                )}
             </div>
         </AppLayout>
     );
