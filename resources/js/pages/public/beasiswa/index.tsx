@@ -35,11 +35,18 @@ interface Beasiswa {
     is_registration_open: boolean;
 }
 
-interface Props {
-    beasiswas: Beasiswa[];
+interface Faq {
+    id: number;
+    question: string;
+    answer: string;
 }
 
-export default function BeasiswaIndex({ beasiswas }: Props) {
+interface Props {
+    beasiswas: Beasiswa[];
+    faqs?: Faq[];
+}
+
+export default function BeasiswaIndex({ beasiswas, faqs = [] }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [selectedBeasiswa, setSelectedBeasiswa] = useState<Beasiswa | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,7 +100,7 @@ export default function BeasiswaIndex({ beasiswas }: Props) {
                 });
             }
         },
-        { scope: containerRef, dependencies: [beasiswas] },
+        { scope: containerRef, dependencies: [beasiswas, faqs] },
     );
 
 
@@ -260,6 +267,56 @@ export default function BeasiswaIndex({ beasiswas }: Props) {
                                 <p className="text-[21px] text-[#7a7a7a]">Belum ada informasi beasiswa saat ini.</p>
                             </div>
                         )}
+                    </div>
+                </section>
+
+                {/* FAQ Section */}
+                <section className="faq-section relative overflow-hidden bg-gradient-to-b from-[#f9fafb] to-white py-[80px] md:py-[120px]">
+                    {/* Background decorations */}
+                    <div className="pointer-events-none absolute left-0 top-0 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0066cc]/5 blur-[100px]" />
+                    <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] translate-x-1/3 translate-y-1/3 rounded-full bg-[#0066cc]/5 blur-[100px]" />
+                    
+                    <div className="mx-auto max-w-[1200px] px-6 relative z-10">
+                        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
+                            {/* Left Text */}
+                            <div className="lg:sticky lg:top-[140px] lg:w-[40%]">
+                                <h2 className="mb-6 text-[32px] font-semibold leading-[1.1] tracking-tight text-black md:text-[46px]">
+                                    Pertanyaan Umum
+                                </h2>
+                                <p className="text-[17px] leading-[1.6] text-slate-700 md:text-[19px] md:font-light">
+                                    Temukan jawaban cepat untuk pertanyaan-pertanyaan yang paling sering diajukan seputar pendaftaran beasiswa.
+                                </p>
+                            </div>
+
+                            {/* Right Accordion */}
+                            <div className="lg:w-[60%]">
+                                {faqs && faqs.length > 0 ? (
+                                    <div className="space-y-4 md:space-y-6">
+                                        {faqs.map((faq) => (
+                                            <details key={faq.id} className="group rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 hover:border-blue-100 hover:shadow-[0_8px_30px_rgba(0,102,204,0.08)] md:p-8 [&_summary::-webkit-details-marker]:hidden cursor-pointer">
+                                                <summary className="flex items-center justify-between text-[17px] font-semibold text-black outline-none md:text-[21px]">
+                                                    <span className="pr-8 leading-snug">{faq.question}</span>
+                                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f5f5f7] transition-all duration-500 group-open:bg-[#0066cc] group-open:text-white group-open:rotate-180 md:h-12 md:w-12">
+                                                        <svg className="h-5 w-5 md:h-6 md:w-6 transition-transform group-open:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </span>
+                                                </summary>
+                                                <div className="mt-5 overflow-hidden text-[16px] leading-[1.7] text-slate-700 md:text-[18px]">
+                                                    <div className="border-t border-gray-100 pt-5 whitespace-pre-wrap">
+                                                        {faq.answer}
+                                                    </div>
+                                                </div>
+                                            </details>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex h-[200px] flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-gray-200 bg-gray-50 text-center">
+                                        <p className="text-[18px] text-slate-500">Belum ada FAQ yang ditambahkan.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\RecapController;
 use App\Http\Controllers\Admin\SubmissionVerificationController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BeasiswaController;
+use App\Http\Controllers\BeasiswaFaqController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('dashboard/divisions/{division}/remove-user', [DivisionController::class, 'removeUser'])->name('divisions.remove-user');
 
         Route::resource('dashboard/beasiswas', BeasiswaController::class)->names('beasiswas');
+        Route::resource('dashboard/beasiswa-faqs', BeasiswaFaqController::class)->names('beasiswa-faqs');
 
         Route::resource('dashboard/users', UserController::class)->names('users');
     });

@@ -94,6 +94,7 @@ class BeasiswaController extends Controller
     {
         return Inertia::render('public/beasiswa/index', [
             'beasiswas' => $this->beasiswaService->getPublished(),
+            'faqs' => \App\Models\BeasiswaFaq::where('is_active', true)->get(),
         ]);
     }
 }
