@@ -23,10 +23,21 @@ class NewsController extends Controller
     /**
      * Display a listing of the resource for the public.
      */
-    public function publicIndex(): Response
+    public function publicIndex(Request $request): Response
     {
+        $search = $request->input('search');
+
         return Inertia::render('front/news/index', [
-            'news' => News::with('category')->latest()->get(),
+            'news' => News::with('category')
+                ->when($search, function ($query, $search) {
+                    return $query->where('title', 'like', "%{$search}%")
+                                 ->orWhere('content', 'like', "%{$search}%");
+                })
+                ->latest()
+                ->get(),
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
