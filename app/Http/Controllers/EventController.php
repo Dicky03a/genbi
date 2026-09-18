@@ -17,9 +17,21 @@ class EventController extends Controller
             ->latest('starts_at')
             ->get();
 
+        $attendedEvents = collect();
+
         if ($user) {
+            $attendedEvents = Event::query()
+                ->with(['komisariat', 'roles'])
+                ->whereHas('attendances', function($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->latest('starts_at')
+                ->get();
+
+            $allEventIds = $events->pluck('id')->concat($attendedEvents->pluck('id'))->unique();
+
             $userAttendances = \App\Models\Attendance::where('user_id', $user->id)
-                ->whereIn('event_id', $events->pluck('id'))
+                ->whereIn('event_id', $allEventIds)
                 ->get()
                 ->keyBy('event_id');
 
@@ -28,10 +40,17 @@ class EventController extends Controller
                 $event->my_attendance_status = $att ? $att->status : null;
                 return $event;
             });
+
+            $attendedEvents->transform(function ($event) use ($userAttendances) {
+                $att = $userAttendances->get($event->id);
+                $event->my_attendance_status = $att ? $att->status : null;
+                return $event;
+            });
         }
 
         return Inertia::render('events/index', [
             'events' => $events,
+            'attendedEvents' => $attendedEvents,
         ]);
     }
 

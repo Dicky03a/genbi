@@ -2,13 +2,11 @@ import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Home, Info, LayoutGrid, Newspaper, User, Users, X } from 'lucide-react';
+import { Building2, GraduationCap, Home, LayoutGrid, Newspaper, User, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from './app-logo-icon';
 
-// ─── Design Tokens — Refined Glass ──────────────────────────────
-// Brand accent dipertahankan dari desain asli, hanya ditambah varian
-// deep/soft supaya gradasi & tint terasa lebih "premium" tanpa lepas dari identitas.
+
 const INK = '#12121F';
 const INK_SOFT = '#5B6172';
 const ACCENT = '#3B5BDB';
@@ -16,9 +14,6 @@ const ACCENT_DEEP = '#2A3FA8';
 const ACCENT_SOFT = '#EEF1FD';
 const HAIRLINE = 'rgba(18, 18, 31, 0.08)';
 
-// Bahasa "glass" yang sama dipakai ulang di header, bottom-nav, dan sheet
-// (ambient depth + contact shadow + inner highlight) supaya ketiganya terasa
-// satu material, bukan tiga treatment yang beda-beda.
 const glassShadow = (elevated = false) =>
     [
         '0 1px 2px rgba(18,18,31,0.04)',
@@ -80,8 +75,8 @@ export function PublicNavbar() {
 
     const navItems: NavItemData[] = [
         { id: 'home', label: 'Home', url: '/', icon: Home },
-        { id: 'Profile', label: 'Profile', url: route('profile'), icon: User },
-        { id: 'beasiswa', label: 'Informasi Beasiswa', url: '/beasiswa', icon: Info },
+        { id: 'profile', label: 'Profil', url: '/profile', icon: Building2 },
+        { id: 'beasiswa', label: 'Beasiswa', url: '/beasiswa', icon: GraduationCap },
         { id: 'berita', label: 'Berita', url: '/berita', icon: Newspaper },
         { id: 'divisi', label: 'Divisi', url: '/divisi', icon: Users },
     ];
@@ -138,7 +133,7 @@ export function PublicNavbar() {
                                     href={item.url}
                                     aria-current={isActive ? 'page' : undefined}
                                     className="relative block rounded-full px-4 py-1.5 text-[14px] font-medium transition-colors duration-150"
-                                    style={{ color: isActive ? ACCENT : INK }}
+                                    style={{ color: isActive ? ACCENT_DEEP : INK, fontWeight: isActive ? 600 : 500 }}
                                 >
                                     {isActive ? (
                                         <motion.div
@@ -146,8 +141,12 @@ export function PublicNavbar() {
                                             initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.86 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             className="absolute inset-0 rounded-full"
-                                            style={{ background: ACCENT_SOFT }}
-                                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }}
+                                            style={{ 
+                                                background: 'linear-gradient(180deg, #FFFFFF 0%, #F5F7FF 100%)',
+                                                border: '1px solid rgba(59, 91, 219, 0.15)',
+                                                boxShadow: '0 2px 10px -2px rgba(59, 91, 219, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1)'
+                                            }}
+                                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 30 }}
                                         />
                                     ) : (
                                         <div className="absolute inset-0 rounded-full transition-colors duration-150 hover:bg-black/[0.04]" />
@@ -209,26 +208,40 @@ export function PublicNavbar() {
                                 key={item.id}
                                 href={item.url}
                                 aria-current={isActive ? 'page' : undefined}
-                                className="relative flex h-[54px] w-[54px] flex-col items-center justify-center"
+                                className={cn(
+                                    "relative flex h-[54px] items-center justify-center",
+                                    !isActive && "w-[48px]"
+                                )}
                             >
                                 {isActive && (
                                     <motion.div
                                         layoutId="mobile-active-pill"
-                                        initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.75 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="absolute h-11 w-11 rounded-[14px]"
-                                        style={{ background: INK }}
-                                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }}
+                                        className="absolute inset-y-1.5 inset-x-0 rounded-full"
+                                        style={{ background: '#12121F' }}
+                                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 28 }}
                                     />
                                 )}
-                                <motion.div whileTap={{ scale: 0.88 }} className="relative flex h-11 w-11 items-center justify-center rounded-[14px]">
+                                <div className="relative flex h-11 items-center justify-center gap-1.5 px-3">
                                     <Icon
-                                        className="h-[22px] w-[22px] transition-colors"
+                                        className="shrink-0 h-[18px] w-[18px] transition-colors duration-300"
                                         style={{ color: isActive ? '#fff' : INK_SOFT }}
-                                        strokeWidth={isActive ? 2.5 : 2}
-                                        fill={isActive ? 'currentColor' : 'none'}
+                                        strokeWidth={isActive ? 2.5 : 2.2}
+                                        fill="none"
                                     />
-                                </motion.div>
+                                    <AnimatePresence>
+                                        {isActive && (
+                                            <motion.span
+                                                initial={{ width: 0, opacity: 0 }}
+                                                animate={{ width: 'auto', opacity: 1 }}
+                                                exit={{ width: 0, opacity: 0 }}
+                                                transition={{ duration: 0.25, ease: "easeOut" }}
+                                                className="overflow-hidden whitespace-nowrap text-[12.5px] font-medium text-white origin-left"
+                                            >
+                                                {item.label}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </Link>
                         );
                     })}
