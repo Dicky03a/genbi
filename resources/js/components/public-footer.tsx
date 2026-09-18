@@ -11,98 +11,59 @@ export function PublicFooter() {
                 </div>
 
                 {/* Directory Links */}
-                <div className="grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:grid-cols-4 md:gap-8 lg:grid-cols-5">
+                {/* Directory Links */}
+                <div className="grid grid-cols-2 gap-6 py-8 md:grid-cols-4 md:gap-8 lg:grid-cols-4">
                     <div>
                         <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Tentang GenBI</h3>
                         <ul className="flex flex-col space-y-2 text-[12px] tracking-[-0.12px]">
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Sejarah
+                                <Link href="/profile" className="hover:text-[#1d1d1f] hover:underline">
+                                    Profil
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Visi & Misi
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Struktur Organisasi
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Program Kerja
+                                <Link href="/divisi" className="hover:text-[#1d1d1f] hover:underline">
+                                    Divisi
                                 </Link>
                             </li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Beasiswa</h3>
+                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Layanan & Program</h3>
                         <ul className="flex flex-col space-y-2 text-[12px] tracking-[-0.12px]">
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Persyaratan
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Cara Mendaftar
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Jadwal Seleksi
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    FAQ
+                                <Link href="/beasiswa" className="hover:text-[#1d1d1f] hover:underline">
+                                    Beasiswa
                                 </Link>
                             </li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Berita & Artikel</h3>
+                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Informasi Publik</h3>
                         <ul className="flex flex-col space-y-2 text-[12px] tracking-[-0.12px]">
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Kegiatan Terbaru
+                                <Link href="/berita" className="hover:text-[#1d1d1f] hover:underline">
+                                    Berita
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Opini
+                                <Link href="/prestasi" className="hover:text-[#1d1d1f] hover:underline">
+                                    Prestasi
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Prestasi Anggota
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Galeri
+                                <Link href="/template-file" className="hover:text-[#1d1d1f] hover:underline">
+                                    Template File
                                 </Link>
                             </li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Dukungan</h3>
+                        <h3 className="mb-3 text-[14px] font-semibold tracking-[-0.224px] text-[#1d1d1f]">Pengguna</h3>
                         <ul className="flex flex-col space-y-2 text-[12px] tracking-[-0.12px]">
                             <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Hubungi Kami
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Panduan Pengguna
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="hover:text-[#1d1d1f] hover:underline">
-                                    Download Format
+                                <Link href={route('login')} className="hover:text-[#1d1d1f] hover:underline">
+                                    Login Sistem
                                 </Link>
                             </li>
                         </ul>
@@ -113,7 +74,7 @@ export function PublicFooter() {
                 <div className="flex flex-col items-start justify-between border-t border-[#d2d2d7]/40 pt-8 text-[12px] tracking-[-0.12px] md:flex-row md:items-center">
                     <div className="mb-4 md:mb-0">
                         More ways to connect: <span className="cursor-pointer text-[#0066cc] hover:underline">Find a GenBI chapter</span> near
-                        you. Or call 147.
+                        you. Or call 085748138557.
                     </div>
                     <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
                         <div>Copyright © {new Date().getFullYear()} GenBI Indonesia. All rights reserved.</div>

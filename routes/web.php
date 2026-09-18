@@ -28,6 +28,9 @@ use Inertia\Inertia;
 Route::get('/', function () {
     $about = About::first();
     $latestNews = News::with('category')->latest()->take(3)->get();
+    $prestasis = \App\Models\Prestasi::with('user')->latest()->take(6)->get();
+    $faqs = \App\Models\BeasiswaFaq::where('is_active', true)->get();
+    $members = \App\Models\User::whereNotNull('avatar')->inRandomOrder()->take(24)->get();
 
     return Inertia::render('app', [
         'about' => $about ? [
@@ -42,6 +45,9 @@ Route::get('/', function () {
             'profile' => 'GenBI adalah komunitas penerima beasiswa Bank Indonesia yang tersebar di seluruh perguruan tinggi di Indonesia.',
         ],
         'latestNews' => $latestNews,
+        'prestasis' => $prestasis,
+        'faqs' => $faqs,
+        'members' => $members,
     ]);
 })->name('home');
 

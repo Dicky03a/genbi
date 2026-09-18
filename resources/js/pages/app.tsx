@@ -1,5 +1,8 @@
 import { AboutSection } from '@/components/about-section';
 import { HomeNewsSection } from '@/components/home-news-section';
+import { HomePrestasiSection } from '@/components/front/home-prestasi-section';
+import { HomeGallerySection } from '@/components/front/home-gallery-section';
+import { HomeFaqSection } from '@/components/front/home-faq-section';
 import { PublicFooter } from '@/components/public-footer';
 import { PublicNavbar } from '@/components/public-navbar';
 import { stripHtml } from '@/lib/utils';
@@ -19,9 +22,12 @@ interface AppPageProps extends SharedData {
         profile: string;
     };
     latestNews: any[];
+    prestasis: any[];
+    faqs: any[];
+    members: any[];
 }
 
-export default function App({ about, latestNews }: AppPageProps) {
+export default function App({ about, latestNews, prestasis, faqs, members }: AppPageProps) {
     const marqueeRef = useRef<HTMLDivElement>(null);
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -119,6 +125,11 @@ export default function App({ about, latestNews }: AppPageProps) {
                 {/* Latest News Section */}
                 <HomeNewsSection news={latestNews} />
                 
+                {/* Prestasi Section */}
+                <HomePrestasiSection prestasis={prestasis} />
+
+                {/* FAQ Section */}
+                <HomeFaqSection faqs={faqs} />
             </main>
 
             <PublicFooter />
